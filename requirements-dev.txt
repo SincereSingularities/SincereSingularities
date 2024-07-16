@@ -1,0 +1,6 @@
+# This file contains all the development requirements for our linting toolchain.
+# Don't forget to pin your dependencies!
+# This list will have to be migrated if you wish to use another dependency manager.
+
+ruff~=0.5.0
+pre-commit~=3.7.1
