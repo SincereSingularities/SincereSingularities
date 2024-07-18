@@ -25,13 +25,11 @@ ignore = [
     "D107",
     # Docstring whitespace.
     "D203",
-    "D213",
+    "D212",
     # Docstring punctuation.
     "D415",
     # Docstring quotes.
     "D301",
-    # Builtins.
-    "A",
     # Print statements.
     "T20",
     # TODOs.
@@ -41,4 +39,16 @@ ignore = [
     # Annotations.
     "ANN101",
     "ANN102",
+    # Future annotations.
+    "FA",
+    # Error messages.
+    "EM",
 ]
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+ignore-decorators = ["typing.overload"]
+
+[tool.mypy]
+strict = true
