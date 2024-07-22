@@ -1,17 +1,17 @@
-from typing import List
-
 import disnake
 
-from sincere_singularities.utils import load_json
 from sincere_singularities.restaurant import Restaurant
+from sincere_singularities.utils import RestaurantJsonType, load_json
 
 DISNAKE_COLORS = {
     "red": disnake.Colour.red(),
 }
 
 
-class RestaurantsView(disnake.ui.View):
-    def __init__(self, ctx, embeds: List[disnake.Embed]) -> None:
+class RestaurantsView(disnake.ui.View):  # type: ignore[misc]
+    """View Subclass for Choosing the Restaurant"""
+
+    def __init__(self, ctx: "Restaurants", embeds: list[disnake.Embed]) -> None:
         super().__init__(timeout=None)
         self.ctx = ctx
         self.embeds = embeds
@@ -24,24 +24,24 @@ class RestaurantsView(disnake.ui.View):
         self._update_state()
 
     def _update_state(self) -> None:
-        self.prev_page.disabled = self.index == 0
-        self.next_page.disabled = self.index == len(self.embeds) - 1
+        self._prev_page.disabled = self.index == 0
+        self._next_page.disabled = self.index == len(self.embeds) - 1
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary)
-    async def prev_page(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def _prev_page(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         self.index -= 1
         self._update_state()
 
         await inter.response.edit_message(embed=self.embeds[self.index], view=self)
 
     @disnake.ui.button(label="Enter Restaurant", style=disnake.ButtonStyle.green)
-    async def enter_restaurant(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def _enter_restaurant(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         # Enter Restaurant based on current index
         restaurant = self.ctx.restaurants[self.index]
-        restaurant.enter_menu(inter)
+        await restaurant.enter_menu(inter)
 
     @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.secondary)
-    async def next_page(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def _next_page(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         self.index += 1
         self._update_state()
 
@@ -49,29 +49,42 @@ class RestaurantsView(disnake.ui.View):
 
 
 class Restaurants:
+    """Class to Manage the Restaurants & UI"""
+
     def __init__(self, inter: disnake.ApplicationCommandInteraction) -> None:
         self.inter = inter
         # Loading Restaurants
-        self.restaurants_json = load_json("restaurants.json")
+        self.restaurants_json = load_json("restaurants.json", RestaurantJsonType)
         self.view = RestaurantsView(self, self.embeds)
 
     @property
-    def embeds(self) -> List[disnake.Embed]:
+    def embeds(self) -> list[disnake.Embed]:
+        """
+        Getting the Embeds of each Restaurant (On the Restaurant Selection Screen).
+
+        Returns: List of Disnake Embeds
+
+        """
         # Generate Embeds from Restaurants
         embeds = []
 
         for restaurant in self.restaurants_json:
             embed = disnake.Embed(
-                title=restaurant["name"],
-                description=restaurant["description"],
-                colour=DISNAKE_COLORS.get(restaurant["color"], disnake.Color.random()),
+                title=restaurant.name,
+                description=restaurant.description,
+                colour=DISNAKE_COLORS.get(restaurant.color, disnake.Color.random()),
             )
-            # embed.set_author(name=restaurant["name"], url=restaurant["img_url"])
             embeds.append(embed)
 
         return embeds
 
     @property
-    def restaurants(self) -> List[Restaurant]:
+    def restaurants(self) -> list[Restaurant]:
+        """
+        Getting the Restaurants List, each Restaurant is initialized via its JSON.
+
+        Returns: List of Restaurant Classes
+
+        """
         # Creating Restaurant Objects Based on the Data
         return [Restaurant(restaurant) for restaurant in self.restaurants_json]

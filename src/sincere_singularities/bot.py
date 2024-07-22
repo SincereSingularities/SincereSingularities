@@ -8,7 +8,8 @@ bot = commands.InteractionBot(intents=intents)
 
 
 @bot.slash_command(name="start_game")
-async def start_game(inter: disnake.ApplicationCommandInteraction):
+async def start_game(inter: disnake.ApplicationCommandInteraction) -> None:
+    """Main Command of our Game: /start_game"""
     # Load Restaurants
     restaurants = Restaurants(inter)
     await inter.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)

@@ -1,13 +1,21 @@
-from typing import Any
+from disnake import MessageInteraction
 
-import disnake
+from sincere_singularities.utils import RestaurantJson
+
 
 class Restaurant:
-    def __init__(self, restaurant_json: Any):
+    """Represents a single restaurant."""
+
+    def __init__(self, restaurant_json: RestaurantJson) -> None:
         self.restaurant_json = restaurant_json
 
-        self.name = restaurant_json['name']
-        
+        self.name = restaurant_json.name
 
-    def enter_menu(self, inter: disnake.MessageInteraction):
-        print(f"Restaurant {self.name} is entering menu")
+    async def enter_menu(self, inter: MessageInteraction) -> None:
+        """
+        Function Called initially when the user enters the restaurant
+
+        Args:
+            inter: The Disnake MessageInteraction object.
+        """
+        await inter.response.send_message(f"Restaurant {self.name} is entering menu")
