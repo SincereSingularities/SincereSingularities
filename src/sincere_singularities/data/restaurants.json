@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Pizzaria",
+    "icon": ":pizza:",
+    "description": "Pizzaria Placeholder Description",
+    "color": "red",
+    "img_url": "https://discord.com/assets/ebc498ffa1fa3e06b9ea.svg",
+    "menu": {
+      "Starters": [],
+      "Main Courses": [],
+      "Desserts": [],
+      "Drinks": []
+    }
+  },
+  {
+    "name": "Pizzaria Test1",
+    "icon": ":pizza:",
+    "description": "Pizzaria Placeholder Description",
+    "color": "red",
+    "img_url": "https://discord.com/assets/ebc498ffa1fa3e06b9ea.svg",
+    "menu": {
+      "Starters": [],
+      "Main Courses": [],
+      "Desserts": [],
+      "Drinks": []
+    }
+  }
+]
