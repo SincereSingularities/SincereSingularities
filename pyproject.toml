@@ -88,6 +88,13 @@ ignore = [
     "FA",
     # Error messages.
     "EM",
+    # Type Keyword (3.12+)
+    "UP040",
+    # Exceptions
+    "TRY003",
+    # Recommended by Ruff
+    "ISC001",
+    "COM812"
 ]
 
 [tool.ruff.lint.pydocstyle]

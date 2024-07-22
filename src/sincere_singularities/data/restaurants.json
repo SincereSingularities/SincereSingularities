@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Pizzaria",
+    "icon": ":pizza:",
+    "description": "Pizzaria Placeholder Description",
+    "color": "red",
+    "menu": {
+      "Starters": [],
+      "Main Courses": [],
+      "Desserts": [],
+      "Drinks": []
+    }
+  },
+  {
+    "name": "Pizzaria Test1",
+    "icon": ":pizza:",
+    "description": "Pizzaria Placeholder Description",
+    "color": "red",
+    "menu": {
+      "Starters": [],
+      "Main Courses": [],
+      "Desserts": [],
+      "Drinks": []
+    }
+  }
+]
