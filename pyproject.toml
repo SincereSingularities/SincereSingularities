@@ -94,7 +94,9 @@ ignore = [
     "TRY003",
     # Recommended by Ruff
     "ISC001",
-    "COM812"
+    "COM812",
+    # Pseudo-Random Generators
+    "S311"
 ]
 
 [tool.ruff.lint.pydocstyle]

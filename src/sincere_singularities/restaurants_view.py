@@ -1,10 +1,13 @@
+import random
+
 import disnake
 
 from sincere_singularities.restaurant import Restaurant
 from sincere_singularities.utils import RestaurantJsonType, load_json
 
 DISNAKE_COLORS = {
-    "red": disnake.Colour.red(),
+    ":pizza:": disnake.Color.from_rgb(229, 97, 38),
+    ":sushi:": disnake.Color.from_rgb(255, 153, 153),
 }
 
 
@@ -66,14 +69,41 @@ class Restaurants:
 
         """
         # Generate Embeds from Restaurants
-        return [
-            disnake.Embed(
-                title=restaurant.name,
-                description=restaurant.description,
-                colour=DISNAKE_COLORS.get(restaurant.color, disnake.Color.random()),
+        embeds = []
+
+        for restaurant in self.restaurants_json:
+            embed = disnake.Embed(
+                title=f"{restaurant.icon} {restaurant.name} {restaurant.icon}",
+                description=f"{restaurant.description} \n",
+                colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
-            for restaurant in self.restaurants_json
-        ]
+            # Adding an Empty Field for better formatting
+            embed.add_field(" ", " ")
+            # Adding Examples from the Menu
+            embed.add_field(
+                name="Example Starter",
+                value=f"`{random.choice(restaurant.menu['Starters'])}`",
+                inline=False,
+            )
+            embed.add_field(
+                name="Example Main Course",
+                value=f"`{random.choice(restaurant.menu['Main Courses'])}`",
+                inline=False,
+            )
+            embed.add_field(
+                name="Example Dessert",
+                value=f"`{random.choice(restaurant.menu['Desserts'])}`",
+                inline=False,
+            )
+            embed.add_field(
+                name="Example Drink",
+                value=f"`{random.choice(restaurant.menu['Drinks'])}`",
+                inline=False,
+            )
+
+            embeds.append(embed)
+
+        return embeds
 
     @property
     def restaurants(self) -> list[Restaurant]:
