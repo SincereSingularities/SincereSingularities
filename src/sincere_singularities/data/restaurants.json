@@ -3,24 +3,22 @@
     "name": "Pizzaria",
     "icon": ":pizza:",
     "description": "Pizzaria Placeholder Description",
-    "color": "red",
     "menu": {
-      "Starters": [],
-      "Main Courses": [],
-      "Desserts": [],
-      "Drinks": []
+      "Starters": ["Pizza Starter0", "Pizza Starter1"],
+      "Main Courses": ["Main Course0", "Pizza Main Course1"],
+      "Desserts": ["Pizza Dessert0", "Pizza Dessert1"],
+      "Drinks": ["Pizza Drink0", "Pizza Drink1"]
     }
   },
   {
-    "name": "Pizzaria Test1",
-    "icon": ":pizza:",
-    "description": "Pizzaria Placeholder Description",
-    "color": "red",
+    "name": "Sushi Restaurant",
+    "icon": ":sushi:",
+    "description": "Sushi Placeholder Description",
     "menu": {
-      "Starters": [],
-      "Main Courses": [],
-      "Desserts": [],
-      "Drinks": []
+      "Starters": ["Sushi Starter0", "Sushi Starter1"],
+      "Main Courses": ["Sushi Main Course0", "Sushi Main Course1"],
+      "Desserts": ["Sushi Dessert0", "Sushi Dessert1"],
+      "Drinks": ["Drink0", "Drink1"]
     }
   }
 ]

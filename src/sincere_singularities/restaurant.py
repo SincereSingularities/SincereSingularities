@@ -10,6 +10,8 @@ class Restaurant:
         self.restaurant_json = restaurant_json
 
         self.name = restaurant_json.name
+        self.icon = restaurant_json.icon
+        self.description = restaurant_json.description
 
     async def enter_menu(self, inter: MessageInteraction) -> None:
         """
