@@ -20,8 +20,7 @@ class RestaurantJson:
 
 
 RestaurantJsonType: TypeAlias = list[RestaurantJson]
-JsonTypes: TypeAlias = RestaurantJsonType
-T = TypeVar("T", bound=JsonTypes)
+T = TypeVar("T", bound=RestaurantJsonType)
 
 
 def load_json(filename: str, json_type: type[T]) -> T:

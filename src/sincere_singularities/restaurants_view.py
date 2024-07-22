@@ -66,17 +66,14 @@ class Restaurants:
 
         """
         # Generate Embeds from Restaurants
-        embeds = []
-
-        for restaurant in self.restaurants_json:
-            embed = disnake.Embed(
+        return [
+            disnake.Embed(
                 title=restaurant.name,
                 description=restaurant.description,
                 colour=DISNAKE_COLORS.get(restaurant.color, disnake.Color.random()),
             )
-            embeds.append(embed)
-
-        return embeds
+            for restaurant in self.restaurants_json
+        ]
 
     @property
     def restaurants(self) -> list[Restaurant]:
