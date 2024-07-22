@@ -1,3 +1,48 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sincere_singularities"
+version = "1.0.0" # no need to change the version
+description = "Sincere Singularities Python Discord Summer CodeJam 2024 project."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "clucker-m8" },
+    { name = "FoxFil" },
+    { name = "koviubi56" },
+    { name = "Vinyzu" },
+    { name = "WassCodeur" },
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Games/Entertainment",
+    "Typing :: Typed",
+]
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = "requirements.txt" }
+optional-dependencies.dev = { file = ["requirements-dev.txt"] }
+
+[tool.setuptools.package-data]
+sincere_singularities = ["py.typed"]
+
+[project.urls]
+Homepage = "https://github.com/SincereSingularities/SincereSingularities"
+
+[project.scripts]
+sincere_singularities = "sincere_singularities.__main__:main"
+
 [tool.ruff]
 # Increase the line length. This breaks PEP8 but it is way easier to work with.
 # The original reason for this limit was a standard vim terminal is only 79 characters,
@@ -52,3 +97,4 @@ ignore-decorators = ["typing.overload"]
 
 [tool.mypy]
 strict = true
+disallow_untyped_decorators = false

@@ -22,6 +22,9 @@ env
 dist/
 build/
 
+# Distribution / packaging
+*.egg-info/
+
 # IDEs
 # PyCharm
 .idea/
