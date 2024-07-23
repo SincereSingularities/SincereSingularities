@@ -16,16 +16,32 @@ the information overload!
 ## Running the bot
 
 1. Python 3.11 is [recommended](https://github.com/DisnakeDev/disnake/pull/1135#issuecomment-1847303628).
-2. Install the Game:
+2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). <!-- TODO: explain better once we have an idea on how the bot works (e.g. what permissions are required) -->
+3. clone the repository:
     ```shell
    git clone https://github.com/SincereSingularities/SincereSingularities/
    cd SincereSingularities
-   pip install -e .
     ```
-3. Setup
-   a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). <!-- TODO: explain better once we have an idea on how the bot works (e.g. what permissions are required) -->
-4. Set the `BOT_TOKEN` environment variable to your Token using the `.env` file.
-5. Run The Game:
+4. Install dependencies with
+   ```shell
+   pip install -r requirements.txt
+   ```
+
+5. Configure  [MongoDB](https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database) and launch the server.
+6.
+   - Create the `.env` file, copy the contents of `.env.example`, paste it into `.env` and update the database variables with the values from your mongodb database in the `.env` file.
+
+   - Set the `BOT_TOKEN` environment variable to your Token using the `.env` file.:
+    ```shell
+    BOT_TOKEN=your_bot_token
+
+    DB_NAME=your_db_name
+    DB_HOST=your_db_host
+    DB_PORT=your_db_port
+    ```
+
+1. Run The Game:
    ```shell
    python -m sincere_singularities
     ```
+2.  Test the bot in your discord server.
