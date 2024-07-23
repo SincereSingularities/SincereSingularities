@@ -7,7 +7,7 @@ from sincere_singularities.utils import (DISNAKE_COLORS, RestaurantJsonType,
                                          load_json)
 
 
-class RestaurantsView(disnake.ui.View):  # type: ignore[misc]
+class RestaurantsView(disnake.ui.View):
     """View Subclass for Choosing the Restaurant"""
 
     def __init__(self, ctx: "Restaurants", embeds: list[disnake.Embed]) -> None:
