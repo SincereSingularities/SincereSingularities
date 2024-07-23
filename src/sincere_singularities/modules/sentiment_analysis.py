@@ -1,4 +1,3 @@
-
 def check_content(obj1: str, obj2: str) -> float:
     """
     Checking if the content of two objects is roughly same using sentiment analysis.

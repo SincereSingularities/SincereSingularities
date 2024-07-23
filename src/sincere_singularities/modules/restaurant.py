@@ -79,21 +79,23 @@ class Restaurant:
 
         # Customer Name
         name_check = check_content(correct_customer_information.address, customer_information.address)
-        score -= (score_percentile + (-score_percentile * name_check))
+        score -= score_percentile + (-score_percentile * name_check)
 
         # Customer Address
         address_check = check_content(correct_customer_information.address, customer_information.address)
-        score -= (score_percentile + (-score_percentile * address_check))
+        score -= score_percentile + (-score_percentile * address_check)
 
         # Delivery Time
-        delivery_time_check = check_content(correct_customer_information.delivery_time,
-                                            customer_information.delivery_time)
-        score -= (score_percentile + (-score_percentile * delivery_time_check))
+        delivery_time_check = check_content(
+            correct_customer_information.delivery_time, customer_information.delivery_time
+        )
+        score -= score_percentile + (-score_percentile * delivery_time_check)
 
         # Extra Information
-        extra_info_check = check_content(correct_customer_information.extra_information,
-                                         customer_information.extra_information)
-        score -= (score_percentile + (-score_percentile * extra_info_check))
+        extra_info_check = check_content(
+            correct_customer_information.extra_information, customer_information.extra_information
+        )
+        score -= score_percentile + (-score_percentile * extra_info_check)
 
         # Now we can subtract score points for each wrong order
         # Getting every order item
@@ -101,6 +103,6 @@ class Restaurant:
         all_order_items = [item for menu_items in self.order.foods.values() for item in menu_items]
         # Finding Differences between Orders and subtracting from Score
         order_differences = count_differences(correct_order_items, all_order_items)
-        score -= (score_percentile * order_differences)
+        score -= score_percentile * order_differences
 
         return score

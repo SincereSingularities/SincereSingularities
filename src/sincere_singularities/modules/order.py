@@ -4,8 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import disnake
-from disnake import (ButtonStyle, MessageInteraction, ModalInteraction,
-                     TextInputStyle)
+from disnake import ButtonStyle, MessageInteraction, ModalInteraction, TextInputStyle
 
 from sincere_singularities.utils import DISNAKE_COLORS
 
@@ -38,31 +37,17 @@ class CustomerInfoModal(disnake.ui.Modal):
         self.order_view = order_view
         self.order = order
         components = [
+            disnake.ui.TextInput(label="Name", custom_id="name", style=TextInputStyle.short, max_length=64),
+            disnake.ui.TextInput(label="Address", custom_id="address", style=TextInputStyle.short, max_length=64),
             disnake.ui.TextInput(
-                label="Name",
-                custom_id="name",
-                style=TextInputStyle.short,
-                max_length=64
-            ),
-            disnake.ui.TextInput(
-                label="Address",
-                custom_id="address",
-                style=TextInputStyle.short,
-                max_length=64
-            ),
-            disnake.ui.TextInput(
-                label="Time of delivery",
-                custom_id="time",
-                style=TextInputStyle.short,
-                required=False,
-                max_length=64
+                label="Time of delivery", custom_id="time", style=TextInputStyle.short, required=False, max_length=64
             ),
             disnake.ui.TextInput(
                 label="Extra information",
                 custom_id="extra",
                 style=TextInputStyle.paragraph,
                 required=False,
-                max_length=1028
+                max_length=1028,
             ),
         ]
         super().__init__(title="Customer information", components=components)
@@ -96,8 +81,10 @@ class FoodButton(disnake.ui.Button):
 
 class FoodsView(disnake.ui.View):
     """The View for adding a Menu Items (e.g. Main Courses)."""
-    def __init__(self, restaurant: "Restaurant", order_view: "OrderView",
-                 order: Order, menu_item: str, foods: Iterable[str]) -> None:
+
+    def __init__(
+        self, restaurant: "Restaurant", order_view: "OrderView", order: Order, menu_item: str, foods: Iterable[str]
+    ) -> None:
         super().__init__()
         self.restaurant = restaurant
         self.order_view = order_view
@@ -113,8 +100,10 @@ class FoodsView(disnake.ui.View):
 
 class MenuItemButton(disnake.ui.Button):
     """The Button for accessing a Menu Part (e.g. Main Courses)"""
-    def __init__(self, restaurant: "Restaurant", order_view: "OrderView",
-                 order: Order, menu_item: str, btn_index: int) -> None:
+
+    def __init__(
+        self, restaurant: "Restaurant", order_view: "OrderView", order: Order, menu_item: str, btn_index: int
+    ) -> None:
         row_index = 0 if btn_index <= 1 else 1
         super().__init__(label=menu_item, style=ButtonStyle.primary, row=row_index, custom_id=menu_item)
         self.restaurant = restaurant
@@ -124,13 +113,19 @@ class MenuItemButton(disnake.ui.Button):
 
     async def callback(self, inter: MessageInteraction) -> None:
         """The Callback to access a Menu Part."""
-        food_view = FoodsView(self.restaurant, self.order_view, self.order, self.menu_item,
-                              self.restaurant.restaurant_json.menu[self.menu_item] )
+        food_view = FoodsView(
+            self.restaurant,
+            self.order_view,
+            self.order,
+            self.menu_item,
+            self.restaurant.restaurant_json.menu[self.menu_item],
+        )
         await inter.response.edit_message(view=food_view, embed=self.order_view.embed)
 
 
 class OrderView(disnake.ui.View):
     """The view in which the order is displayed and managed by the user."""
+
     def __init__(self, restaurant: "Restaurant") -> None:
         super().__init__()
         self.restaurant = restaurant
@@ -152,9 +147,9 @@ class OrderView(disnake.ui.View):
         for menu_name, menu_items in self.order.foods.items():
             embed.add_field(
                 name=f"Added {menu_name} Items",
-                value="\n".join([
-                    f"- `{item_name}`: {menu_items.count(item_name)}" for item_name in list(set(menu_items))
-                ]),
+                value="\n".join(
+                    [f"- `{item_name}`: {menu_items.count(item_name)}" for item_name in list(set(menu_items))]
+                ),
                 inline=False,
             )
 
@@ -170,5 +165,5 @@ class OrderView(disnake.ui.View):
         await inter.response.edit_message(
             "Order placed successfully!",
             embed=self.restaurant.restaurants.embeds[0],
-            view=self.restaurant.restaurants.view
+            view=self.restaurant.restaurants.view,
         )

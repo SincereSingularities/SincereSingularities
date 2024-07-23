@@ -3,8 +3,7 @@ import random
 import disnake
 
 from sincere_singularities.modules.restaurant import Restaurant
-from sincere_singularities.utils import (DISNAKE_COLORS, RestaurantJsonType,
-                                         load_json)
+from sincere_singularities.utils import DISNAKE_COLORS, RestaurantJsonType, load_json
 
 
 class RestaurantsView(disnake.ui.View):

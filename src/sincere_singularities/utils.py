@@ -13,6 +13,7 @@ DISNAKE_COLORS = {
     ":sushi:": disnake.Color.from_rgb(255, 153, 153),
 }
 
+
 @dataclass(unsafe_hash=True)
 class RestaurantJson:
     """Represents a JSON-like object representing a Restaurant."""
