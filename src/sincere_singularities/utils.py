@@ -1,3 +1,4 @@
+import difflib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -51,3 +52,17 @@ def load_json(filename: str, json_type: type[T]) -> T:
         typed_json: T = dacite.from_dict(json_type, loaded_json)
 
         return typed_json
+
+
+def check_similarity(first: str, second: str) -> float:
+    """
+    Measure of the strings' similarity as a float.
+
+    Args:
+        first (str): The first string.
+        second (str): The second string.
+
+    Returns:
+        float: The similarity of the two strings [0, 1]
+    """
+    return difflib.SequenceMatcher(None, first, second).ratio()
