@@ -1,5 +1,53 @@
 [
   {
+    "name": "McDonald's",
+    "menu": {
+      "Starters": [
+        "Fries",
+        "Nuggets"
+      ],
+      "Main Courses": [
+        "Burger",
+        "Wrap"
+      ],
+      "Desserts": [
+        "Sundae",
+        "Pie"
+      ],
+      "Drinks": [
+        "Coke",
+        "Fanta"
+      ]
+    },
+    "description": "American Fast Food Chain",
+    "icon": "🍔"
+  },
+
+  {
+    "name": "KFC",
+    "menu": {
+      "Starters": [
+        "Fries",
+        "Popcorn Chicken"
+      ],
+      "Main Courses": [
+        "Chicken Bucket",
+        "Chicken Burger"
+      ],
+      "Desserts": [
+        "Sundae",
+        "Pie"
+      ],
+      "Drinks": [
+        "Pepsi",
+        "7UP"
+      ]
+    },
+    "description": "American Fast Food Chain",
+    "icon": "🍗"
+  },
+
+  {
     "name": "Pizzaria",
     "icon": ":pizza:",
     "description": "Pizzaria Placeholder Description",
@@ -44,6 +92,98 @@
       "Drinks": [
         "Drink0",
         "Drink1"
+      ]
+    }
+  },
+  {
+    "name": "Burger Joint",
+    "icon": ":hamburger:",
+    "description": "Burger Placeholder Description",
+    "menu": {
+      "Starters": [
+        "Burger Starter0",
+        "Burger Starter1"
+      ],
+      "Main Courses": [
+        "Burger Main Course0",
+        "Burger Main Course1"
+      ],
+      "Desserts": [
+        "Burger Dessert0",
+        "Burger Dessert1"
+      ],
+      "Drinks": [
+        "Burger Drink0",
+        "Burger Drink1"
+      ]
+    }
+  },
+  {
+    "name": "Ice Cream Shop",
+    "icon": ":icecream:",
+    "description": "Ice Cream Placeholder Description",
+    "menu": {
+      "Starters": [
+        "Ice Cream Starter0",
+        "Ice Cream Starter1"
+      ],
+      "Main Courses": [
+        "Ice Cream Main Course0",
+        "Ice Cream Main Course1"
+      ],
+      "Desserts": [
+        "Ice Cream Dessert0",
+        "Ice Cream Dessert1"
+      ],
+      "Drinks": [
+        "Ice Cream Drink0",
+        "Ice Cream Drink1"
+      ]
+    }
+  },
+  {
+    "name": "Coffee Shop",
+    "icon": ":coffee:",
+    "description": "Coffee Placeholder Description",
+    "menu": {
+      "Starters": [
+        "Coffee Starter0",
+        "Coffee Starter1"
+      ],
+      "Main Courses": [
+        "Coffee Main Course0",
+        "Coffee Main Course1"
+      ],
+      "Desserts": [
+        "Coffee Dessert0",
+        "Coffee Dessert1"
+      ],
+      "Drinks": [
+        "Coffee Drink0",
+        "Coffee Drink1"
+      ]
+    }
+  },
+  {
+    "name": "Bakery",
+    "icon": ":bread:",
+    "description": "Bakery Placeholder Description",
+    "menu": {
+      "Starters": [
+        "Bakery Starter0",
+        "Bakery Starter1"
+      ],
+      "Main Courses": [
+        "Bakery Main Course0",
+        "Bakery Main Course1"
+      ],
+      "Desserts": [
+        "Bakery Dessert0",
+        "Bakery Dessert1"
+      ],
+      "Drinks": [
+        "Bakery Drink0",
+        "Bakery Drink1"
       ]
     }
   }
