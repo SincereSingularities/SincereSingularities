@@ -12,14 +12,14 @@ if TYPE_CHECKING:
     from sincere_singularities.modules.restaurant import Restaurant
 
 
-@dataclass(unsafe_hash=True)
+@dataclass(frozen=True)
 class CustomerInfo:
     """The Dataclass Containing Information added in the Customer Information Section."""
 
-    name: str = ""
-    address: str = ""
-    delivery_time: str = ""
-    extra_information: str = ""
+    name: str
+    address: str
+    delivery_time: str
+    extra_information: str
 
 
 @dataclass(unsafe_hash=True)
