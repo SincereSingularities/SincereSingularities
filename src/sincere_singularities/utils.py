@@ -4,8 +4,14 @@ from pathlib import Path
 from typing import TypeAlias, TypeVar, get_args, get_origin
 
 import dacite
+import disnake
 
 CURRENT_DIR = Path(__file__).parent.absolute()
+
+DISNAKE_COLORS = {
+    ":pizza:": disnake.Color.from_rgb(229, 97, 38),
+    ":sushi:": disnake.Color.from_rgb(255, 153, 153),
+}
 
 
 @dataclass(unsafe_hash=True)

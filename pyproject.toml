@@ -96,7 +96,11 @@ ignore = [
     "ISC001",
     "COM812",
     # Pseudo-Random Generators
-    "S311"
+    "S311",
+    # Asserts
+    "S101",
+    # Function Arguments
+    "PLR0913"
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -107,3 +111,4 @@ ignore-decorators = ["typing.overload"]
 [tool.mypy]
 strict = true
 disallow_untyped_decorators = false
+disallow_subclassing_any = false
