@@ -1,5 +1,4 @@
 from contextlib import suppress
-from typing import ClassVar
 
 from disnake import ApplicationCommandInteraction, ChannelType, Thread, Webhook, WebhookMessage
 from disnake.ext.commands.errors import CommandInvokeError
@@ -11,13 +10,13 @@ from sincere_singularities.utils import generate_random_avatar_url
 class OrderQueue:
     """The Class for managing the order queue. Orders can be spawned and deleted from here."""
 
-    orders: ClassVar[dict[str, tuple[Order, WebhookMessage]]] = {}
     webhook: Webhook
     orders_thread: Thread
 
     def __init__(self, inter: ApplicationCommandInteraction) -> None:
         self.user = inter.user
         self.channel = inter.channel
+        self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
 
     async def start_orders(self) -> None:
         """Start the orders queue. Spawn a new Webhook and Order Thread"""
