@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 class CustomerInfo:
     """The Dataclass Containing Information added in the Customer Information Section."""
 
+    order_id: str
     name: str
     address: str
     delivery_time: str
@@ -27,16 +28,17 @@ class Order:
     """The Dataclass Containing Order Information."""
 
     customer_information: CustomerInfo | None = None
+    restaurant_name: str | None = None
     foods: defaultdict[str, list[str]] = field(default_factory=lambda: defaultdict(list[str]))
 
 
 class CustomerInfoModal(disnake.ui.Modal):
     """The Modal for entering Customer Information."""
 
-    def __init__(self, order_view: "OrderView", order: Order) -> None:
+    def __init__(self, order_view: "OrderView") -> None:
         self.order_view = order_view
-        self.order = order
         components = [
+            disnake.ui.TextInput(label="Order ID", custom_id="order_id", style=TextInputStyle.short, max_length=64),
             disnake.ui.TextInput(label="Name", custom_id="name", style=TextInputStyle.short, max_length=64),
             disnake.ui.TextInput(label="Address", custom_id="address", style=TextInputStyle.short, max_length=64),
             disnake.ui.TextInput(
@@ -54,7 +56,15 @@ class CustomerInfoModal(disnake.ui.Modal):
 
     async def callback(self, inter: ModalInteraction) -> None:
         """The Callback when the User has entered the Customer Information."""
-        self.order.customer_information = CustomerInfo(
+        if not self.order_view.restaurant.order_queue.get_order_by_id(inter.text_values["order_id"]):
+            embed = self.order_view.embed
+            embed.add_field(name="Error", value="Incorrect order ID. Try again.", inline=False)
+            await inter.response.edit_message(view=self.order_view, embed=embed)
+            return
+
+        self.order_view.order.restaurant_name = self.order_view.restaurant.name
+        self.order_view.order.customer_information = CustomerInfo(
+            order_id=inter.text_values["order_id"],
             name=inter.text_values["name"],
             address=inter.text_values["address"],
             delivery_time=inter.text_values["time"],
@@ -129,7 +139,7 @@ class OrderView(disnake.ui.View):
     def __init__(self, restaurant: "Restaurant") -> None:
         super().__init__()
         self.restaurant = restaurant
-        self.order = self.restaurant.order
+        self.order = Order()
         for i, menu_item in enumerate(restaurant.menu):
             self.add_item(MenuItemButton(restaurant, self, self.order, menu_item, i))
 
@@ -155,13 +165,25 @@ class OrderView(disnake.ui.View):
 
     @disnake.ui.button(label="Customer Information", style=disnake.ButtonStyle.success, row=2)
     async def _customer_information(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await inter.response.send_modal(CustomerInfoModal(self, self.order))
+        await inter.response.send_modal(CustomerInfoModal(self))
 
     @disnake.ui.button(label="Done", style=disnake.ButtonStyle.success, row=2)
     async def _order_done(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         # Sending Order Placed Message and back to Start Screen
+        if not self.order.customer_information:
+            await inter.response.edit_message(
+                "Customer information missing!",
+                embed=self.restaurant.restaurants.embeds[0],
+                view=self.restaurant.restaurants.view,
+            )
+            return
+        user_order = self.restaurant.order_queue.get_order_by_id(self.order.customer_information.order_id)
+        assert user_order
+        correctness = self.restaurant.check_order(self.order, user_order)
+        await self.restaurant.order_queue.discard_order(self.order.customer_information.order_id)
+
         await inter.response.edit_message(
-            "Order placed successfully!",
+            f"Order placed successfully! Correctness: {round(correctness, 4)*100}%",
             embed=self.restaurant.restaurants.embeds[0],
             view=self.restaurant.restaurants.view,
         )
