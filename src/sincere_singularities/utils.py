@@ -1,5 +1,6 @@
 import difflib
 import json
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeAlias, TypeVar, get_args, get_origin
@@ -96,3 +97,16 @@ def compare_sentences(first: str, second: str) -> float:
     # Check Similarity using Cosine Similarity
     similarity = util.pytorch_cos_sim(embeddings[0], embeddings[1])
     return similarity.item()  # type: ignore[no-any-return]
+
+
+def generate_random_avatar_url() -> str:
+    """
+    Generate a random avatar image URL.
+
+    Returns:
+        str: A random image URL.
+    """
+    seed = random.random()
+    flip = random.choice(("true", "false"))
+    background_color = hex(random.randrange(0x000000, 0xFFFFFF))[2:].zfill(6)
+    return f"https://api.dicebear.com/9.x/notionists/svg?seed={seed}&flip={flip}&backgroundColor={background_color}"
