@@ -5,10 +5,15 @@ from pathlib import Path
 from typing import TypeAlias, TypeVar, get_args, get_origin
 
 import dacite
+import disnake
 import torch
 from sentence_transformers import SentenceTransformer, util
 
 CURRENT_DIR = Path(__file__).parent.absolute()
+DISNAKE_COLORS = {
+    ":pizza:": disnake.Color.from_rgb(229, 97, 38),
+    ":sushi:": disnake.Color.from_rgb(255, 153, 153),
+}
 
 # Use GPU if available
 device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -1,7 +1,7 @@
 import disnake
 from disnake.ext import commands
 
-from sincere_singularities.restaurants_view import Restaurants
+from sincere_singularities.modules.restaurants_view import Restaurants
 
 intents = disnake.Intents.default()
 bot = commands.InteractionBot(intents=intents)
