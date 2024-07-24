@@ -5,8 +5,15 @@ from pathlib import Path
 from typing import TypeAlias, TypeVar, get_args, get_origin
 
 import dacite
+import torch
+from sentence_transformers import SentenceTransformer, util
 
 CURRENT_DIR = Path(__file__).parent.absolute()
+
+# Use GPU if available
+device = "cuda" if torch.cuda.is_available() else "cpu"
+# Load the MiniLM SentenceTransformer Model
+minilm_model = SentenceTransformer("all-MiniLM-L6-v2", device=device)
 
 
 @dataclass(unsafe_hash=True)
@@ -54,9 +61,9 @@ def load_json(filename: str, json_type: type[T]) -> T:
         return typed_json
 
 
-def check_similarity(first: str, second: str) -> float:
+def check_pattern_similarity(first: str, second: str) -> float:
     """
-    Measure of the strings' similarity as a float.
+    Measure of the strings' similarity as a float using Gestalt Pattern Matching Algorithm.
 
     Args:
         first (str): The first string.
@@ -66,3 +73,21 @@ def check_similarity(first: str, second: str) -> float:
         float: The similarity of the two strings [0, 1]
     """
     return difflib.SequenceMatcher(None, first, second).ratio()
+
+
+def compare_sentences(first: str, second: str) -> float:
+    """
+    Measure of the strings' similarity as a float using Sentence Transformer's MiniLM.
+
+    Args:
+        first (str): The first string.
+        second (str): The second string.
+
+    Returns:
+        float: The similarity of the two strings [0, 1]
+    """
+    # Encode sentences in batch to speed up the process
+    embeddings = minilm_model.encode([first, second], convert_to_tensor=True, device=device)
+    # Check Similarity using Cosine Similarity
+    similarity = util.pytorch_cos_sim(embeddings[0], embeddings[1])
+    return similarity.item()  # type: ignore[no-any-return]
