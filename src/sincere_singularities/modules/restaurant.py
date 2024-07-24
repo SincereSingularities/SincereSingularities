@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING
 from disnake import MessageInteraction
 
 from sincere_singularities.modules.order import Order, OrderView
-from sincere_singularities.modules.sentiment_analysis import check_content
-from sincere_singularities.utils import RestaurantJson
+from sincere_singularities.utils import RestaurantJson, check_pattern_similarity, compare_sentences
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.restaurants_view import Restaurants
@@ -78,21 +77,21 @@ class Restaurant:
         assert customer_information  # TODO: blame the user for not filling out the Customer Information
 
         # Customer Name
-        name_check = check_content(correct_customer_information.address, customer_information.address)
+        name_check = check_pattern_similarity(correct_customer_information.address, customer_information.address)
         score -= score_percentile + (-score_percentile * name_check)
 
         # Customer Address
-        address_check = check_content(correct_customer_information.address, customer_information.address)
+        address_check = check_pattern_similarity(correct_customer_information.address, customer_information.address)
         score -= score_percentile + (-score_percentile * address_check)
 
         # Delivery Time
-        delivery_time_check = check_content(
+        delivery_time_check = compare_sentences(
             correct_customer_information.delivery_time, customer_information.delivery_time
         )
         score -= score_percentile + (-score_percentile * delivery_time_check)
 
         # Extra Information
-        extra_info_check = check_content(
+        extra_info_check = compare_sentences(
             correct_customer_information.extra_information, customer_information.extra_information
         )
         score -= score_percentile + (-score_percentile * extra_info_check)
