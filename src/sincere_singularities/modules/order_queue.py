@@ -77,11 +77,12 @@ class OrderQueue:
         Args:
             order_id: ID of the Order to discard.
         """
-        if self.orders.get(order_id):
+        with suppress(KeyError):
             del self.orders[order_id]
 
     async def stop_orders(self) -> None:
         """Stop All Orders (when stopping the game)."""
+        # TODO: Make sure these cant fail (or catch specific Errors)
         with suppress(Exception):
             # Deleting Webhook
             await self.webhook.delete()
