@@ -7,6 +7,7 @@ from sincere_singularities.modules.order import Order, OrderView
 from sincere_singularities.utils import RestaurantJson, check_pattern_similarity, compare_sentences
 
 if TYPE_CHECKING:
+    from sincere_singularities.modules.order_queue import OrderQueue
     from sincere_singularities.modules.restaurants_view import Restaurants
 
 
@@ -42,7 +43,7 @@ class Restaurant:
         self.menu = restaurant_json.menu
 
         # Order Related
-        self.order = Order()
+        self.order_queue: OrderQueue = restaurants.order_queue
 
     async def enter_menu(self, inter: MessageInteraction) -> None:
         """
@@ -54,27 +55,33 @@ class Restaurant:
         view = OrderView(self)
         await inter.response.edit_message(embed=view.embed, view=view)
 
-    def check_order(self, correct_order: Order) -> float:
+    def check_order(self, order: Order, correct_order: Order) -> float:
         """
         Checking if the order was correctly placed by the user.
 
         Args:
+            order: The Order to check.
             correct_order: The Correct Order to check against.
 
         Returns:
             How correct the order was placed in percentage (as a float)
         """
         score = 1.0
-        # The effect on the Score each wrong answer should have (Length of Menu Items + Customer Information Items)
-        score_percentile = 1 / (len(correct_order.foods) + 4)
+        # The effect on the Score each wrong answer should have
+        # (Length of Menu Items + Customer Information Items + 1 for the restaurant)
+        score_percentile = 1 / (len(correct_order.foods) + 4 + 1)
 
         # Subtracting Sentiment Analysis Scores of the Customer Information
         # This is achieved using a linear interpolation, meaning if the check gives 1.0, 0.0 will be subtracted from
         # the score, but when the check gives 0.0, score_percentile will be subtracted
         correct_customer_information = correct_order.customer_information
         assert correct_customer_information
-        customer_information = self.order.customer_information
-        assert customer_information  # TODO: blame the user for not filling out the Customer Information
+        customer_information = order.customer_information
+        assert customer_information
+
+        # Restaurant
+        if correct_order.restaurant_name != order.restaurant_name:
+            score -= score_percentile
 
         # Customer Name
         name_check = check_pattern_similarity(correct_customer_information.address, customer_information.address)
@@ -99,7 +106,7 @@ class Restaurant:
         # Now we can subtract score points for each wrong order
         # Getting every order item
         correct_order_items = [item for menu_items in correct_order.foods.values() for item in menu_items]
-        all_order_items = [item for menu_items in self.order.foods.values() for item in menu_items]
+        all_order_items = [item for menu_items in order.foods.values() for item in menu_items]
         # Finding Differences between Orders and subtracting from Score
         order_differences = count_differences(correct_order_items, all_order_items)
         score -= score_percentile * order_differences

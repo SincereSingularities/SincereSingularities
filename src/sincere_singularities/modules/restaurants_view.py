@@ -2,6 +2,7 @@ import random
 
 import disnake
 
+from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.restaurant import Restaurant
 from sincere_singularities.utils import DISNAKE_COLORS, RestaurantJsonType, load_json
 
@@ -58,13 +59,15 @@ class RestaurantsView(disnake.ui.View):
         # TODO: Savestates?
         # TODO: fix awful typing when implemented
         await self.ctx.inter.delete_original_message()
+        await self.ctx.order_queue.stop_orders()
 
 
 class Restaurants:
     """Class to Manage the Restaurants & UI"""
 
-    def __init__(self, inter: disnake.ApplicationCommandInteraction) -> None:
+    def __init__(self, inter: disnake.ApplicationCommandInteraction, order_queue: OrderQueue) -> None:
         self.inter = inter
+        self.order_queue = order_queue
         # Loading Restaurants
         self.restaurants_json = load_json("restaurants.json", RestaurantJsonType)
 
