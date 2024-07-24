@@ -148,7 +148,7 @@ class OrderView(disnake.ui.View):
             embed.add_field(
                 name=f"Added {menu_name} Items",
                 value="\n".join(
-                    [f"- `{item_name}`: {menu_items.count(item_name)}" for item_name in list(set(menu_items))]
+                    f"- `{item_name}`: {menu_items.count(item_name)}" for item_name in set(menu_items)
                 ),
                 inline=False,
             )
