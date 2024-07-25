@@ -8,6 +8,47 @@ intents = Intents.default()
 bot = commands.InteractionBot(intents=intents)
 
 
+@bot.slash_command(name="clear_webhooks")
+async def clear_webhooks(inter: ApplicationCommandInteraction) -> None:
+    """Clears the webhoooks in a channel."""
+    # Check user permissions
+    permissions = inter.channel.permissions_for(inter.author)
+    if not permissions.manage_webhooks:
+        await inter.response.send_message("You dont have the permissions to Manage Webhooks!", ephemeral=True)
+        return
+
+    # Check if the Message was sent in a Text Channel
+    if not isinstance(inter.channel, TextChannel):
+        await inter.response.send_message("Im only able to clear webhooks inside of a Text Channel!", ephemeral=True)
+        return
+
+    webhooks = await inter.channel.webhooks()
+    for webhook in webhooks:
+        await webhook.delete()
+
+    await inter.response.send_message("Webhooks cleared!", ephemeral=True)
+
+
+@bot.slash_command(name="clear_threads")
+async def clear_threads(inter: ApplicationCommandInteraction) -> None:
+    """Clears the threads in a channel."""
+    # Check user permissions
+    permissions = inter.channel.permissions_for(inter.author)
+    if not permissions.manage_threads:
+        await inter.response.send_message("You dont have the permissions to Manage Threads!", ephemeral=True)
+        return
+
+    # Check if the Message was sent in a Text Channel
+    if not isinstance(inter.channel, TextChannel):
+        await inter.response.send_message("Im only able to clear threads inside of a Text Channel!", ephemeral=True)
+        return
+
+    for thread in inter.channel.threads:
+        await thread.delete()
+
+    await inter.response.send_message("Threads cleared!", ephemeral=True)
+
+
 @bot.slash_command(name="start_game")
 async def start_game(inter: ApplicationCommandInteraction) -> None:
     """Main Command of our Game: /start_game"""
@@ -16,6 +57,7 @@ async def start_game(inter: ApplicationCommandInteraction) -> None:
         await inter.response.send_message(
             "You can only start a Game Session inside of a Text Channel!", ephemeral=True
         )
+        return
 
     # Start Order Queue
     order_queue = OrderQueue(inter)
