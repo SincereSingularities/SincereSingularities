@@ -52,6 +52,7 @@ async def clear_threads(inter: ApplicationCommandInteraction) -> None:
 @bot.slash_command(name="start_game")
 async def start_game(inter: ApplicationCommandInteraction) -> None:
     """Main Command of our Game: /start_game"""
+    # TODO: in the entire game, make sure that buttons can only be clicked on by the user who it was intended for!
     # Check if the Message was sent in a Text Channel
     if not isinstance(inter.channel, TextChannel):
         await inter.response.send_message(

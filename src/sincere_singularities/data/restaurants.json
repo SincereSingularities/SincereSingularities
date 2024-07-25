@@ -3,22 +3,48 @@
     "name": "Pizzaria",
     "icon": ":pizza:",
     "description": "Pizzaria Placeholder Description",
+    "points": 0,
     "menu": {
-      "Starters": ["Pizza Starter0", "Pizza Starter1"],
-      "Main Courses": ["Main Course0", "Pizza Main Course1"],
-      "Desserts": ["Pizza Dessert0", "Pizza Dessert1"],
-      "Drinks": ["Pizza Drink0", "Pizza Drink1"]
+      "Starters": [
+        "Pizza Starter0",
+        "Pizza Starter1"
+      ],
+      "Main Courses": [
+        "Main Course0",
+        "Pizza Main Course1"
+      ],
+      "Desserts": [
+        "Pizza Dessert0",
+        "Pizza Dessert1"
+      ],
+      "Drinks": [
+        "Pizza Drink0",
+        "Pizza Drink1"
+      ]
     }
   },
   {
     "name": "Sushi Restaurant",
     "icon": ":sushi:",
     "description": "Sushi Placeholder Description",
+    "points": 300,
     "menu": {
-      "Starters": ["Sushi Starter0", "Sushi Starter1"],
-      "Main Courses": ["Sushi Main Course0", "Sushi Main Course1"],
-      "Desserts": ["Sushi Dessert0", "Sushi Dessert1"],
-      "Drinks": ["Drink0", "Drink1"]
+      "Starters": [
+        "Sushi Starter0",
+        "Sushi Starter1"
+      ],
+      "Main Courses": [
+        "Sushi Main Course0",
+        "Sushi Main Course1"
+      ],
+      "Desserts": [
+        "Sushi Dessert0",
+        "Sushi Dessert1"
+      ],
+      "Drinks": [
+        "Drink0",
+        "Drink1"
+      ]
     }
   }
 ]
