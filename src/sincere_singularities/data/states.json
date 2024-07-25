@@ -1,0 +1,29 @@
+[
+    {
+        "game_id": "game123",
+        "name": "game123",
+        "player_id": "player456",
+        "state": {
+            "level": 5,
+            "score": 2500
+        }
+    },
+    {
+        "game_id": "game124",
+        "name": "game124",
+        "player_id": "player457",
+        "state": {
+            "level": 6,
+            "score": 3000
+        }
+    },
+    {
+        "game_id": "game125",
+        "name": "game125",
+        "player_id": "player458",
+        "state": {
+            "level": 7,
+            "score": 3500
+        }
+    }
+]

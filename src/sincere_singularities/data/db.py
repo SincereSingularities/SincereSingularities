@@ -1,6 +1,7 @@
 import json
 import os
 from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +14,7 @@ DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 DB_URI = f"mongodb://{DB_HOST}:{DB_PORT}"
-client = MongoClient(DB_URI)
+utc_timezone = UTC
 
 
 class ConnectError(Exception):
@@ -36,7 +37,7 @@ class DbClient:
             self.client = MongoClient(DB_URI)
             self.connected = True
             self.client.server_info()
-            self.db = client[DB_NAME]
+            self.db = self.client[DB_NAME]
             self.restaurants = self.db.restaurants
         except errors.ConnectionFailure as err:
             self.connected = False
@@ -67,6 +68,9 @@ class DbClient:
         name = data["name"]
         # Check if the restaurant already exists
         if not self.db[collection].find_one({"name": name}):
+            current_time = datetime.now(utc_timezone)
+            data["created_at"] = current_time
+            data["updated_at"] = current_time
             self.db[collection].insert_one(data)
 
     def add_many(self, collection: str, datas: Iterable[Any]) -> None:
@@ -109,8 +113,9 @@ class DbClient:
             raise ConnectError("Not connected to the database")
 
         for data in datas:
-            if self.show_one(collection, data):
-                self.db[collection].delete_one(data)
+            if not self.show_one(collection, data):
+                raise ValueError("Element not found")
+            self.db[collection].delete_one(data)
 
     def delete_one(self, collection: str, data: dict[str, Any]) -> None:
         """Delete one element
@@ -124,21 +129,24 @@ class DbClient:
         """
         if not self.connected:
             raise ConnectError("Not connected to the database")
-        if self.show_one(collection, data):
-            self.db[collection].delete_one(data)
+        if not self.show_one(collection, data):
+            raise ValueError("Element not found")
+        self.db[collection].delete_one(data)
 
-    def show_all(self, collection: str) -> Iterable[Any]:
+    def show_all(self, collection: str) -> list[dict[str, Any]]:
         """Show all elements
 
         Args:
             collection (str): Collection name
 
         Returns:
-            Iterable[Any]: All elements in the collection
+            list[Any]: All elements in the collection
         """
         if not self.connected:
             raise ConnectError("Not connected to the database")
-        return list(self.db[collection].find({}))
+
+        elements = self.db[collection].find({})
+        return [dict(element) for element in elements]
 
     def show_one(self, collection: str, data: dict[str, Any]) -> dict[str, Any]:
         """Show one element
@@ -153,15 +161,26 @@ class DbClient:
         if not self.connected:
             raise ConnectError("Not connected to the database")
 
-        return dict(self.db[collection].find_one(data))
+        element = self.db[collection].find_one(data)
+        if not element:
+            raise ValueError("Element not found")
+        return dict(element)
 
-    def update_one(self, collection: str, data: dict[str, Any], new_data: dict[str, Any]) -> None:
+    def update_one(
+        self,
+        collection: str,
+        data: dict[str, Any],
+        new_data: dict[str, Any],
+        *,
+        upsert: bool = False,
+    ) -> None:
         """Update one element in the collection
 
         Args:
             collection (str): Collection name
             data (dict[str, Any]): Data to update
             new_data (dict[str, Any]): New data to update
+            upsert (bool, optional): Whether to upsert. Defaults to False.
 
         Returns:
             None
@@ -169,8 +188,14 @@ class DbClient:
         if not self.connected:
             raise ConnectError("Not connected to the database")
 
-        if self.show_one(collection, data):
-            self.db[collection].update_one(data, {"$set": new_data})
+        element = self.show_one(collection, data)
+
+        if not element:
+            raise ValueError("Element not found")
+
+        current_time = datetime.now(utc_timezone)
+        new_data["updated_at"] = current_time
+        self.db[collection].update_one(data, {"$set": new_data}, upsert=upsert)
 
     def update_many(self, collection: str, datas: Iterable[Any], new_datas: Iterable[Any]) -> None:
         """Update many elements in the collection
@@ -187,14 +212,14 @@ class DbClient:
             raise ConnectError("Not connected to the database")
 
         for data, new_data in zip(datas, new_datas, strict=False):
-            if self.show_one(collection, data):
-                self.db[collection].update_one(data, {"$set": new_data})
+            if not self.show_one(collection, data):
+                raise ValueError("Element not found")
+            self.db[collection].update_one(data, {"$set": new_data})
 
 
 if __name__ == "__main__":
     db = DbClient()
-    db = DbClient()
-    path = Path("src/sincere_singularities/data/restaurants.json")
+    path = Path(__file__).parent / "restaurants.json"
 
     with path.open() as f:
         restaurants = json.load(f)
