@@ -204,7 +204,8 @@ class OrderView(disnake.ui.View):
         embed.insert_field_at(
             index=1,
             name=":loudspeaker: :white_check_mark: Info :white_check_mark: :loudspeaker:",
-            value=f"**Order placed successfully! Correctness: {round(correctness, 4)*100}% You gained {points} points; you now have {get_points(inter.user.id)}!**",
+            value=f"**Order placed successfully! Correctness: {round(correctness, 4)*100}% You gained {points} points;"
+            f" you now have {get_points(inter.user.id)}!**",
             inline=False,
         )
         await inter.response.edit_message(embed=embed, view=self.restaurant.restaurants.view)

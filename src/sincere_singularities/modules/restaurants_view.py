@@ -65,7 +65,8 @@ class RestaurantsView(disnake.ui.View):
                 view=RestaurantPurchaseView(inter.user.id, restaurant, self),
                 embed=disnake.Embed(
                     title="You do not own this restaurant.",
-                    description=f"It costs {restaurant.points} points.\nYou have {user_points}.\nAfter buying it, you'd have {user_points - restaurant.points}.",
+                    description=f"It costs {restaurant.points} points.\nYou have {user_points}.\nAfter buying it,"
+                    f" you'd have {user_points - restaurant.points}.",
                     colour=disnake.Color.yellow(),
                 ),
             )
@@ -129,7 +130,8 @@ class Restaurants:
         for restaurant in self.restaurants_json:
             embed = disnake.Embed(
                 title=f"{restaurant.icon} {restaurant.name} {restaurant.icon}",
-                description=f"{restaurant.description} \n**Required points**: {restaurant.points} (you have {get_points(self.inter.user.id)})",
+                description=f"{restaurant.description} \n**Required points**: {restaurant.points}"
+                f" (you have {get_points(self.inter.user.id)})",
                 colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
             # Adding an Empty Field for better formatting
