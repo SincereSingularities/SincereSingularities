@@ -56,9 +56,17 @@ class CustomerInfoModal(disnake.ui.Modal):
 
     async def callback(self, inter: ModalInteraction) -> None:
         """The Callback when the User has entered the Customer Information."""
+        # Check if wrong OrderID was entered
         if not self.order_view.restaurant.order_queue.get_order_by_id(inter.text_values["order_id"]):
+            # Adding Error Message
             embed = self.order_view.embed
-            embed.add_field(name="Error", value="Incorrect order ID. Try again.", inline=False)
+            embed.insert_field_at(index=0, name=" ", value=" ", inline=False)
+            embed.insert_field_at(
+                index=1,
+                name=":rotating_light: :warning: Error :warning: :rotating_light:",
+                value="**Incorrect order ID. Try again.**",
+                inline=False,
+            )
             await inter.response.edit_message(view=self.order_view, embed=embed)
             return
 
@@ -171,19 +179,29 @@ class OrderView(disnake.ui.View):
     async def _order_done(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         # Sending Order Placed Message and back to Start Screen
         if not self.order.customer_information:
-            await inter.response.edit_message(
-                "Customer information missing!",
-                embed=self.restaurant.restaurants.embeds[0],
-                view=self.restaurant.restaurants.view,
+            embed = self.embed
+            embed.insert_field_at(index=0, name=" ", value=" ", inline=False)
+            embed.insert_field_at(
+                index=1,
+                name=":rotating_light: :warning: Error :warning: :rotating_light:",
+                value="**Customer information missing!**",
+                inline=False,
             )
+            await inter.response.edit_message(embed=embed, view=self)
             return
+
         user_order = self.restaurant.order_queue.get_order_by_id(self.order.customer_information.order_id)
         assert user_order
         correctness = self.restaurant.check_order(self.order, user_order)
         await self.restaurant.order_queue.discard_order(self.order.customer_information.order_id)
 
-        await inter.response.edit_message(
-            f"Order placed successfully! Correctness: {round(correctness, 4)*100}%",
-            embed=self.restaurant.restaurants.embeds[0],
-            view=self.restaurant.restaurants.view,
+        # Adding Info to embed
+        embed = self.restaurant.restaurants.embeds[0]
+        embed.insert_field_at(index=0, name=" ", value=" ", inline=False)
+        embed.insert_field_at(
+            index=1,
+            name=":loudspeaker: :white_check_mark: Info :white_check_mark: :loudspeaker:",
+            value=f"**Order placed successfully! Correctness: {round(correctness, 4)*100}%**",
+            inline=False,
         )
+        await inter.response.edit_message(embed=embed, view=self.restaurant.restaurants.view)
