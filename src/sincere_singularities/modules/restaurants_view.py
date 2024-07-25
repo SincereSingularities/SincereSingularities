@@ -3,18 +3,40 @@ import random
 import disnake
 
 from sincere_singularities.modules.order_queue import OrderQueue
+from sincere_singularities.modules.points import buy_restaurant, get_points, has_restaurant
 from sincere_singularities.modules.restaurant import Restaurant
 from sincere_singularities.utils import DISNAKE_COLORS, RestaurantJsonType, load_json
+
+
+class RestaurantPurchaseView(disnake.ui.View):
+    """View subclass for buying a restaurant"""
+
+    def __init__(self, user_id: int, restaurant: Restaurant, parent: "RestaurantsView") -> None:
+        super().__init__(timeout=None)
+        self.user_id = user_id
+        self.restaurant = restaurant
+        self.parent = parent
+        if get_points(user_id) < restaurant.points:
+            self._buy.disabled = True
+
+    @disnake.ui.button(label="Buy", style=disnake.ButtonStyle.success)
+    async def _buy(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+        buy_restaurant(self.user_id, self.restaurant.name)
+        await inter.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
+
+    @disnake.ui.button(label="Cancel", style=disnake.ButtonStyle.secondary)
+    async def _cancel(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+        await inter.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
 
 
 class RestaurantsView(disnake.ui.View):
     """View Subclass for Choosing the Restaurant"""
 
-    def __init__(self, ctx: "Restaurants", embeds: list[disnake.Embed]) -> None:
+    def __init__(self, ctx: "Restaurants", embeds: list[disnake.Embed], index: int = 0) -> None:
         super().__init__(timeout=None)
         self.ctx = ctx
         self.embeds = embeds
-        self.index = 0
+        self.index = index
 
         # Sets the footer of the embeds with their respective page numbers.
         for i, embed in enumerate(self.embeds):
@@ -35,10 +57,21 @@ class RestaurantsView(disnake.ui.View):
 
     @disnake.ui.button(label="Enter Restaurant", style=disnake.ButtonStyle.success, row=0)
     async def _enter_restaurant(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+        # Find Restaurant based on current index
+        restaurant = self.ctx.restaurants[self.index]
+        if not has_restaurant(inter.user.id, restaurant.name):
+            user_points = get_points(inter.user.id)
+            await inter.response.edit_message(
+                view=RestaurantPurchaseView(inter.user.id, restaurant, self),
+                embed=disnake.Embed(
+                    title="You do not own this restaurant.",
+                    description=f"It costs {restaurant.points} points.\nYou have {user_points}.\nAfter buying it, you'd have {user_points - restaurant.points}.",
+                    colour=disnake.Color.yellow(),
+                ),
+            )
+            return
         # Stopping view
         self.stop()
-        # Enter Restaurant based on current index
-        restaurant = self.ctx.restaurants[self.index]
         await restaurant.enter_menu(inter)
 
     @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.secondary, row=0)
@@ -96,7 +129,7 @@ class Restaurants:
         for restaurant in self.restaurants_json:
             embed = disnake.Embed(
                 title=f"{restaurant.icon} {restaurant.name} {restaurant.icon}",
-                description=f"{restaurant.description} \n",
+                description=f"{restaurant.description} \n**Required points**: {restaurant.points} (you have {get_points(self.inter.user.id)})",
                 colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
             # Adding an Empty Field for better formatting

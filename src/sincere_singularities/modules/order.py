@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import disnake
 from disnake import ButtonStyle, MessageInteraction, ModalInteraction, TextInputStyle
 
+from sincere_singularities.modules.points import add_points, get_points
 from sincere_singularities.utils import DISNAKE_COLORS
 
 if TYPE_CHECKING:
@@ -194,6 +195,8 @@ class OrderView(disnake.ui.View):
         assert user_order
         correctness = self.restaurant.check_order(self.order, user_order)
         await self.restaurant.order_queue.discard_order(self.order.customer_information.order_id)
+        points = round(correctness * 10)  # 100% -> 10p
+        add_points(inter.user.id, points)
 
         # Adding Info to embed
         embed = self.restaurant.restaurants.embeds[0]
@@ -201,7 +204,7 @@ class OrderView(disnake.ui.View):
         embed.insert_field_at(
             index=1,
             name=":loudspeaker: :white_check_mark: Info :white_check_mark: :loudspeaker:",
-            value=f"**Order placed successfully! Correctness: {round(correctness, 4)*100}%**",
+            value=f"**Order placed successfully! Correctness: {round(correctness, 4)*100}% You gained {points} points; you now have {get_points(inter.user.id)}!**",
             inline=False,
         )
         await inter.response.edit_message(embed=embed, view=self.restaurant.restaurants.view)

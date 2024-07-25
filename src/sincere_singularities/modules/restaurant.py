@@ -40,6 +40,7 @@ class Restaurant:
         self.name = restaurant_json.name
         self.icon = restaurant_json.icon
         self.description = restaurant_json.description
+        self.points = restaurant_json.points
         self.menu = restaurant_json.menu
 
         # Order Related
