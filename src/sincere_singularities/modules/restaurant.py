@@ -67,6 +67,9 @@ class Restaurant:
         Returns:
             How correct the order was placed in percentage (as a float)
         """
+        # Adjust Order to Conditions
+        correct_order = self.restaurants.condition_manager.adjust_order_to_conditions(correct_order)
+
         score = 1.0
         # The effect on the Score each wrong answer should have
         # (Length of Menu Items + Customer Information Items + 1 for the restaurant)

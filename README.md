@@ -1,7 +1,8 @@
 # Game Title Here
 
 **Sincere Singularities** Python Discord Summer CodeJam 2024 project.
-The technology is **Discord Application**, the theme is **Information Overload**, and our chosen framework is [Disnake](https://github.com/DisnakeDev/disnake/).
+The technology is **Discord Application**, the theme is **Information Overload**, and our chosen framework
+is [Disnake](https://github.com/DisnakeDev/disnake/).
 
 ---
 
@@ -9,7 +10,8 @@ Did you ever want to experience the information overload and stress of a phone o
 Well, then you're at the right place!
 
 We've created a first stressful Discord game, in which you play a phone operator for a restaurant.
-No matter what dishes, customers, or special orders you have to serve, don't lose focus, or you might get overwhelmed by the information overload!
+No matter what dishes, customers, or special orders you have to serve, don't lose focus, or you might get overwhelmed by
+the information overload!
 
 ## Running the bot
 
