@@ -142,5 +142,6 @@ class OrderQueue:
         with suppress(HTTPException, NotFound):
             # Deleting Webhook
             await self.webhook.delete()
+        with suppress(HTTPException, NotFound):
             # Deleting Orders Thread
             await self.orders_thread.delete()
