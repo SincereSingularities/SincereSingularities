@@ -1,49 +1,307 @@
 [
   {
-    "name": "Pizzaria",
+    "name": "Pizzeria",
     "icon": ":pizza:",
-    "description": "Pizzaria Placeholder Description",
+    "description": "The Pizzaria Restaurant is the starter Restaurant. It offers typical Italian food. The Pizzaria is fairly busy.",
     "points": 0,
+    "order_amount": 3,
     "menu": {
       "Starters": [
-        "Pizza Starter0",
-        "Pizza Starter1"
+        "Garlic Knots",
+        "Bruschetta",
+        "Caprese Salad",
+        "Stuffed Mushrooms",
+        "Fried Calamari",
+        "Mozzarella Sticks",
+        "Antipasto",
+        "Spinach Artichoke Dip"
       ],
       "Main Courses": [
-        "Main Course0",
-        "Pizza Main Course1"
+        "Margherita Pizza",
+        "Pepperoni Pizza",
+        "BBQ Chicken Pizza",
+        "Hawaiian Pizza",
+        "Veggie Pizza",
+        "Meat Lovers Pizza",
+        "White Pizza",
+        "Buffalo Chicken Pizza",
+        "Four Cheese Pizza",
+        "Sausage and Peppers Pizza"
       ],
       "Desserts": [
-        "Pizza Dessert0",
-        "Pizza Dessert1"
+        "Tiramisu",
+        "Cannoli",
+        "Gelato",
+        "Panna Cotta",
+        "Zeppole",
+        "Chocolate Pizza"
       ],
       "Drinks": [
-        "Pizza Drink0",
-        "Pizza Drink1"
+        "Soda",
+        "Iced Tea",
+        "Lemonade",
+        "Beer",
+        "Red Wine",
+        "White Wine",
+        "Sparkling Water",
+        "Espresso",
+        "Cappuccino",
+        "Limoncello"
       ]
     }
   },
   {
-    "name": "Sushi Restaurant",
-    "icon": ":sushi:",
-    "description": "Sushi Placeholder Description",
-    "points": 300,
+    "name": "Fast Food",
+    "icon": ":hamburger:",
+    "description": "The Fast Food restaurant offers typically American foods including hamburgers and fries. It is very busy at all times.",
+    "points": 25,
+    "order_amount": 4,
     "menu": {
       "Starters": [
-        "Sushi Starter0",
-        "Sushi Starter1"
+        "French Fries",
+        "Onion Rings",
+        "Mozzarella Sticks",
+        "Chicken Nuggets",
+        "Cheese Curds",
+        "Garlic Bread",
+        "Jalapeno Poppers",
+        "Loaded Potato Skins"
       ],
       "Main Courses": [
-        "Sushi Main Course0",
-        "Sushi Main Course1"
+        "Cheeseburger",
+        "Hot Dog",
+        "Chicken Sandwich",
+        "Veggie Burger",
+        "Bacon Cheeseburger",
+        "Fish Sandwich",
+        "Grilled Chicken Wrap",
+        "Philly Cheesesteak",
+        "Pulled Pork Sandwich",
+        "Double Cheeseburger"
       ],
       "Desserts": [
-        "Sushi Dessert0",
-        "Sushi Dessert1"
+        "Ice Cream Cone",
+        "Apple Pie",
+        "Chocolate Sundae",
+        "Milkshake",
+        "Brownie",
+        "Soft Serve Ice Cream"
       ],
       "Drinks": [
-        "Drink0",
-        "Drink1"
+        "Soda",
+        "Lemonade",
+        "Iced Tea",
+        "Milkshake",
+        "Water",
+        "Coffee",
+        "Hot Chocolate",
+        "Orange Juice",
+        "Apple Juice",
+        "Grape Soda"
+      ]
+    }
+  },
+  {
+    "name": "Meat",
+    "icon": ":cut_of_meat:",
+    "description": "The Meat Restaurant focuses on a wide variety of meats. But it also has some delicious desserts! You won't get that many orders for here.",
+    "points": 50,
+    "order_amount": 2,
+    "menu": {
+      "Starters": [
+        "Buffalo Wings",
+        "Beef Carpaccio",
+        "Prosciutto and Melon",
+        "Lamb Skewers",
+        "Chicken Livers",
+        "Pork Belly Bites",
+        "Meatballs",
+        "Sausage Rolls"
+      ],
+      "Main Courses": [
+        "Steak",
+        "Ribs",
+        "Roast Chicken",
+        "Pork Chops",
+        "Lamb Chops",
+        "BBQ Brisket",
+        "Pulled Pork",
+        "Veal Parmesan",
+        "Beef Stroganoff",
+        "Chicken Alfredo"
+      ],
+      "Desserts": [
+        "Chocolate Lava Cake",
+        "Cheesecake",
+        "Brownie Sundae",
+        "Apple Pie",
+        "Tiramisu",
+        "Bread Pudding"
+      ],
+      "Drinks": [
+        "Red Wine",
+        "Beer",
+        "Whiskey",
+        "Iced Tea",
+        "Old Fashioned",
+        "Manhattan",
+        "Martini",
+        "Negroni",
+        "Rum",
+        "Cognac"
+      ]
+    }
+  },
+  {
+    "name": "Sushi",
+    "icon": ":sushi:",
+    "description": "The Sushi restaurant offers sushi and other typically Japanese dishes. Not too many people order Sushi.",
+    "points": 50,
+    "order_amount": 2,
+    "menu": {
+      "Starters": [
+        "Edamame",
+        "Miso Soup",
+        "Seaweed Salad",
+        "Gyoza",
+        "Shumai",
+        "Agedashi Tofu",
+        "Tuna Tataki",
+        "Cucumber Salad"
+      ],
+      "Main Courses": [
+        "California Roll",
+        "Spicy Tuna Roll",
+        "Salmon Nigiri",
+        "Eel Avocado Roll",
+        "Rainbow Roll",
+        "Dragon Roll",
+        "Tempura Roll",
+        "Shrimp Nigiri",
+        "Philadelphia Roll",
+        "Vegetable Roll"
+      ],
+      "Desserts": [
+        "Mochi Ice Cream",
+        "Green Tea Ice Cream",
+        "Red Bean Ice Cream",
+        "Dorayaki",
+        "Matcha Cheesecake",
+        "Tempura Banana"
+      ],
+      "Drinks": [
+        "Green Tea",
+        "Sake",
+        "Plum Wine",
+        "Ramune",
+        "Asahi Beer",
+        "Sapporo Beer",
+        "Oolong Tea",
+        "Mugicha",
+        "Calpico",
+        "Yuzu Juice"
+      ]
+    }
+  },
+  {
+    "name": "Seafood",
+    "icon": ":shrimp:",
+    "description": "In this restaurant you can find everything the heart desires from the sea. This restaurant isn't as busy.",
+    "points": 75,
+    "order_amount": 1,
+    "menu": {
+      "Starters": [
+        "Clam Chowder",
+        "Shrimp Cocktail",
+        "Calamari",
+        "Oysters Rockefeller",
+        "Crab Cakes",
+        "Lobster Bisque",
+        "Ceviche",
+        "Mussels in White Wine Sauce"
+      ],
+      "Main Courses": [
+        "Grilled Salmon",
+        "Fish and Chips",
+        "Lobster Tail",
+        "Seafood Paella",
+        "Crab Legs",
+        "Shrimp Scampi",
+        "Blackened Catfish",
+        "Tuna Steak",
+        "Seafood Alfredo",
+        "Baked Cod"
+      ],
+      "Desserts": [
+        "Key Lime Pie",
+        "Sea Salt Caramel Cheesecake",
+        "Lemon Sorbet",
+        "Coconut Cream Pie",
+        "Pineapple Upside-Down Cake",
+        "Mango Sorbet"
+      ],
+      "Drinks": [
+        "White Wine",
+        "Sparkling Water",
+        "Margarita",
+        "Lemonade",
+        "Beer",
+        "Rum Punch",
+        "Bloody Mary",
+        "Champagne",
+        "Sangria",
+        "Mojito"
+      ]
+    }
+  },
+  {
+    "name": "Chinese",
+    "icon": ":fortune_cookie:",
+    "description": "The Chinese Restaurant serves Chinese cuisine like dumplings and fortune cookies. This restaurant can be busy at times.",
+    "points": 75,
+    "order_amount": 3,
+    "menu": {
+      "Starters": [
+        "Spring Rolls",
+        "Dumplings",
+        "Hot and Sour Soup",
+        "Chicken Satay",
+        "Egg Drop Soup",
+        "Fried Wontons",
+        "Crab Rangoon",
+        "Lettuce Wraps"
+      ],
+      "Main Courses": [
+        "Kung Pao Chicken",
+        "Sweet and Sour Pork",
+        "Beef with Broccoli",
+        "Vegetable Chow Mein",
+        "General Tso's Chicken",
+        "Orange Chicken",
+        "Moo Shu Pork",
+        "Shrimp Fried Rice",
+        "Chicken Fried Rice",
+        "Beef Fried Rice"
+      ],
+      "Desserts": [
+        "Fortune Cookies",
+        "Mango Pudding",
+        "Egg Tarts",
+        "Sesame Balls",
+        "Red Bean Paste Buns",
+        "Almond Cookies"
+      ],
+      "Drinks": [
+        "Green Tea",
+        "Jasmine Tea",
+        "Soy Milk",
+        "Plum Juice",
+        "Bubble Tea",
+        "Oolong Tea",
+        "Chrysanthemum Tea",
+        "Tsingtao Beer",
+        "Chinese Herbal Tea",
+        "Rice Wine"
       ]
     }
   }
