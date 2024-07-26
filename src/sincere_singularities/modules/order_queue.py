@@ -17,8 +17,9 @@ class OrderQueue:
         self.user = inter.user
         self.channel = inter.channel
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
+        self.running = False
 
-    async def start_orders(self) -> None:
+    async def spawn_orders(self) -> None:
         """Start the orders queue. Spawn a new Webhook and Order Thread"""
         # Creating the Order Webhook
         try:
@@ -34,6 +35,7 @@ class OrderQueue:
             name="Orders Thread", type=ChannelType.public_thread, invitable=False
         )
         await self.orders_thread.add_user(self.user)
+        self.running = True
 
     async def create_order(self, customer_name: str, order_message: str, order_result: Order) -> None:
         """
@@ -81,6 +83,7 @@ class OrderQueue:
 
     async def stop_orders(self) -> None:
         """Stop All Orders (when stopping the game)."""
+        self.running = False
         # TODO: Make sure these cant fail (or catch specific Errors)
         with suppress(Exception):
             # Deleting Webhook

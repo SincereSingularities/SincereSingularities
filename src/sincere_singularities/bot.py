@@ -1,6 +1,9 @@
+import asyncio
+
 from disnake import ApplicationCommandInteraction, Intents, TextChannel
 from disnake.ext import commands
 
+from sincere_singularities.modules.conditions import ConditionManager
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.restaurants_view import Restaurants
 
@@ -52,7 +55,6 @@ async def clear_threads(inter: ApplicationCommandInteraction) -> None:
 @bot.slash_command(name="start_game")
 async def start_game(inter: ApplicationCommandInteraction) -> None:
     """Main Command of our Game: /start_game"""
-    # TODO: in the entire game, make sure that buttons can only be clicked on by the user who it was intended for!
     # Check if the Message was sent in a Text Channel
     if not isinstance(inter.channel, TextChannel):
         await inter.response.send_message(
@@ -64,8 +66,19 @@ async def start_game(inter: ApplicationCommandInteraction) -> None:
     order_queue = OrderQueue(inter)
     # Load Restaurants
     restaurants = Restaurants(inter, order_queue)
+
+    # Sending Start Menu Embed
     await inter.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)
-    await order_queue.start_orders()
+
+    # Spawning Orders
+    await order_queue.spawn_orders()
+
+    # Load ConditionManager (Orders need to be initialized)
+    condition_manager = ConditionManager(order_queue, restaurants)
+    restaurants.condition_manager = condition_manager
+    # Spawning Conditions
+    _ = asyncio.create_task(condition_manager.spawn_conditions())
+    print("got here")
 
     # Creating Temporary example order
     from sincere_singularities.modules.order import CustomerInfo, Order
