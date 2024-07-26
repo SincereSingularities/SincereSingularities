@@ -95,7 +95,7 @@ class OrderQueue:
             order_result: The correct result the Order should give
         """
         discord_tz = f"<t:{order_result.penalty_timestamp.timestamp()}:R>"
-        order_message += f" The order should be completed within {discord_tz}  seconds or you will get a penalty!"
+        order_message += f" The order should be completed within {discord_tz} seconds or you will get a penalty!"
         order_message = await self.webhook.send(
             content=order_message,
             username=customer_name,
