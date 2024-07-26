@@ -30,7 +30,6 @@ class CustomerInfo:
 class Order:
     """The Dataclass Containing Order Information."""
 
-    order_timestamp: datetime | None = None
     customer_information: CustomerInfo | None = None
     restaurant_name: str | None = None
     foods: defaultdict[str, list[str]] = field(default_factory=lambda: defaultdict(list[str]))
