@@ -9,14 +9,7 @@ from sincere_singularities.modules.order import CustomerInfo, Order
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.restaurants_view import Restaurants
 
-CONDITIONS_PROBABILITIES = {
-    "OUT_OF_STOCK_SECTION": 0.2,
-    "OUT_OF_STOCK_ITEM": 0.4,
-    "NO_FIRSTNAME": 0.1,
-    "NO_DELIVERY": 0.1,
-    "NO_DELIVERY_TIME": 0.1,
-    "NO_EXTRA_INFORMATION": 0.1,
-}
+background_tasks = set()
 
 
 class ConditionType(StrEnum):
@@ -28,6 +21,16 @@ class ConditionType(StrEnum):
     NO_DELIVERY = auto()
     NO_DELIVERY_TIME = auto()
     NO_EXTRA_INFORMATION = auto()
+
+
+CONDITIONS_PROBABILITIES = {
+    ConditionType.OUT_OF_STOCK_SECTION: 0.2,
+    ConditionType.OUT_OF_STOCK_ITEM: 0.4,
+    ConditionType.NO_FIRSTNAME: 0.1,
+    ConditionType.NO_DELIVERY: 0.1,
+    ConditionType.NO_DELIVERY_TIME: 0.1,
+    ConditionType.NO_EXTRA_INFORMATION: 0.1,
+}
 
 
 @dataclass
@@ -60,18 +63,15 @@ class ConditionManager:
 
     async def spawn_conditions(self) -> None:
         """Constantly Spawn Conditions on the restaurants while the Game is running."""
-        # while self.order_queue.running:
-        for _ in range(1):
+        while self.order_queue.running:
             spawn_interval = random.randint(6, 12)
             despawn_interval = float(random.randint(60, 120))
             await asyncio.sleep(spawn_interval)
 
-            condition = ConditionType[
-                random.choices(
-                    population=list(CONDITIONS_PROBABILITIES.keys()),
-                    weights=list(CONDITIONS_PROBABILITIES.values()),
-                )[0]
-            ]
+            condition = random.choices(
+                population=list(CONDITIONS_PROBABILITIES.keys()),
+                weights=list(CONDITIONS_PROBABILITIES.values()),
+            )[0]
 
             restaurant = random.choice(self.restaurants.restaurants)
             menu_section, menu_item = None, None
@@ -81,9 +81,11 @@ class ConditionManager:
                 menu_item = random.choice(restaurant.menu[menu_section])
 
             await self.apply_condition(condition, restaurant.name, despawn_interval, menu_section, menu_item)
-            asyncio.create_task(
+            task = asyncio.create_task(
                 self.delete_condition(condition, restaurant.name, despawn_interval, menu_section, menu_item)
             )
+            background_tasks.add(task)
+            task.add_done_callback(background_tasks.discard)
 
     async def apply_condition(
         self,

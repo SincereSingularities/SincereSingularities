@@ -100,9 +100,7 @@ ignore = [
     # Asserts
     "S101",
     # Function Arguments
-    "PLR0913",
-    # Async Return Values
-    "RUF006"
+    "PLR0913"
 ]
 
 [tool.ruff.lint.pydocstyle]

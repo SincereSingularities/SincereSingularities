@@ -9,6 +9,7 @@ from sincere_singularities.modules.restaurants_view import Restaurants
 
 intents = Intents.default()
 bot = commands.InteractionBot(intents=intents)
+background_tasks = set()
 
 
 @bot.slash_command(name="clear_webhooks")
@@ -77,8 +78,9 @@ async def start_game(inter: ApplicationCommandInteraction) -> None:
     condition_manager = ConditionManager(order_queue, restaurants)
     restaurants.condition_manager = condition_manager
     # Spawning Conditions
-    _ = asyncio.create_task(condition_manager.spawn_conditions())
-    print("got here")
+    task = asyncio.create_task(condition_manager.spawn_conditions())
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)
 
     # Creating Temporary example order
     from sincere_singularities.modules.order import CustomerInfo, Order
