@@ -1,4 +1,5 @@
 import random
+from typing import TYPE_CHECKING
 
 import disnake
 
@@ -6,6 +7,9 @@ from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.points import buy_restaurant, get_points, has_restaurant
 from sincere_singularities.modules.restaurant import Restaurant
 from sincere_singularities.utils import DISNAKE_COLORS, RestaurantJsonType, load_json
+
+if TYPE_CHECKING:
+    from sincere_singularities.modules.conditions import ConditionManager
 
 
 class RestaurantPurchaseView(disnake.ui.View):
@@ -99,6 +103,8 @@ class RestaurantsView(disnake.ui.View):
 class Restaurants:
     """Class to Manage the Restaurants & UI"""
 
+    condition_manager: "ConditionManager"
+
     def __init__(self, inter: disnake.ApplicationCommandInteraction, order_queue: OrderQueue) -> None:
         self.inter = inter
         self.order_queue = order_queue
@@ -171,4 +177,8 @@ class Restaurants:
 
         """
         # Creating Restaurant Objects Based on the Data
-        return [Restaurant(self, restaurant) for restaurant in self.restaurants_json]
+        return [
+            Restaurant(self, restaurant)
+            for restaurant in self.restaurants_json
+            if has_restaurant(self.inter.user.id, restaurant.name)
+        ]
