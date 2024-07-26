@@ -100,7 +100,9 @@ ignore = [
     # Asserts
     "S101",
     # Function Arguments
-    "PLR0913"
+    "PLR0913",
+    # UTC Timezones
+    "DTZ003"
 ]
 
 [tool.ruff.lint.pydocstyle]

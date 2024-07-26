@@ -30,6 +30,7 @@ class RestaurantJson:
     icon: str
     description: str
     points: int
+    order_amount: int
     menu: dict[str, list[str]]
 
 
