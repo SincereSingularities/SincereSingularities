@@ -6,10 +6,7 @@ import disnake
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.points import buy_restaurant, get_points, has_restaurant
 from sincere_singularities.modules.restaurant import Restaurant
-from sincere_singularities.utils import DISNAKE_COLORS, RESTAURANT_JSON
-
-if TYPE_CHECKING:
-    from sincere_singularities.modules.conditions import ConditionManager
+from sincere_singularities.utils import DISNAKE_COLORS
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.conditions import ConditionManager
@@ -122,11 +119,11 @@ class RestaurantsView(disnake.ui.View):
         await interaction.response.edit_message(embed=self.embeds[self.index], view=self)
 
     @disnake.ui.button(label="Pause Orders", style=disnake.ButtonStyle.secondary, row=1)
-    async def _pause_orders(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
-        # Placebo Button. Doesn't do anything but looks nice (to give the user feeling of control.)
-        # This button doesn't do anything because the game ensure the user has 3 orders at all times, so you won't get
-        # more than 3 orders anyway, and they don't run out.
-        await interaction.response.defer()
+    async def _pause_orders(self, *_: disnake.ui.Button | disnake.MessageInteraction) -> None:
+        # Placebo Button. Doesnt do anything but looks nice (to give the user feeling of control.)
+        # This button doesnt do anything because the game ensure the user has 3 orders at all times, so you wont get
+        # more than 3 orders anyway, and they dont run out
+        return
 
     @disnake.ui.button(label="Stop the Game", style=disnake.ButtonStyle.danger, row=1)
     async def _stop_game(self, *_: disnake.ui.Button | disnake.MessageInteraction) -> None:
@@ -154,7 +151,7 @@ class Restaurants:
         self.inter = inter
         self.order_queue = order_queue
         # Loading Restaurants
-        self.restaurants_json = load_json("restaurants.json", RestaurantJsonType)
+        self.restaurants_json = order_queue.restaurant_json
 
     @property
     def view(self) -> RestaurantsView:

@@ -1,14 +1,12 @@
 import asyncio
 import random
 from contextlib import suppress
-from typing import Self
 
 from disnake import (
     ApplicationCommandInteraction,
     ChannelType,
     HTTPException,
     NotFound,
-    TextChannel,
     Thread,
     Webhook,
     WebhookMessage,
@@ -16,17 +14,16 @@ from disnake import (
 from disnake.ext.commands.errors import CommandInvokeError
 
 from sincere_singularities.modules.order import Order
-from sincere_singularities.modules.order_generator import OrderGenerator
 from sincere_singularities.modules.points import has_restaurant
-from sincere_singularities.utils import RESTAURANT_JSON, RestaurantsType, generate_random_avatar_url
+from sincere_singularities.utils import RestaurantJson, RestaurantJsonType, generate_random_avatar_url, load_json
 
 # Temporary
 ORDER_TEMPLATES = [
     (
         "Hello, I'd like to place an order for delivery. My name is {CUSTOMER_NAME}, and I live at {CUSTOMER_ADDRESS}."
         " I'd like to order {ORDER_ITEMS}. Oh, and by the way, I have a cat named Fluffy and I don't like it when"
-        " people ring the doorbell, so please make sure to just knock politely. Please deliver it at {DELIVERY_TIME}."
-        " Thank you.",
+        "people ring the doorbell, so please make sure to just knock politely. Please deliver it at {DELIVERY_TIME}. "
+        "Thank you.",
         "Don't ring the bell",
     )
 ]
@@ -48,8 +45,9 @@ class OrderQueue:
         self.user = interaction.user
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
         self.running = False
+        self.restaurant_json = load_json("restaurants.json", RestaurantJsonType)
 
-    async def spawn_orders(self) -> None:
+    async def init_orders(self) -> None:
         """Start the orders queue. Spawn a new Webhook and Order Thread"""
         # Creating the Order Webhook
         try:
@@ -67,32 +65,18 @@ class OrderQueue:
         await self.orders_thread.add_user(self.user)
         self.running = True
 
-    async def start_orders(self) -> None:
-        """Start the orders queue. Spawns three orders."""
-        self.running = True
-
-        # Creating Orders Thread after initial Message was sent for proper message order.
-        self.orders_thread = await self.interaction.channel.create_thread(
-            name="Orders Thread", type=ChannelType.public_thread, invitable=False
-        )
-        assert self.orders_thread  # MYPY can be stupid at times...
-        await self.orders_thread.add_user(self.interaction.user)
-
         # Spawn 3 Orders at the start, which get refreshed after one order is done
-        for i in range(3):
-            # Waiting after first order is sent for more realistic order messages
-            if i:
-                await asyncio.sleep(random.randint(5, 15))
+        for _ in range(3):
             await self.spawn_order()
 
     async def spawn_order(self) -> None:
-        """Spawning a new randomly generated order."""
+        """Spawning a new randomly genrated Order"""
         if not self.running:
             return
 
         # Filtering out the Restaurants the user has
-        restaurants: RestaurantsType = [
-            restaurant for restaurant in RESTAURANT_JSON if has_restaurant(self.user.id, restaurant.name)
+        restaurants: list[RestaurantJson] = [
+            restaurant for restaurant in self.restaurant_json if has_restaurant(self.user.id, restaurant.name)
         ]
 
         # Calculate the Order Amounts to relative values
@@ -101,12 +85,12 @@ class OrderQueue:
             restaurant.order_amount / order_amounts_sum for restaurant in restaurants
         ]
 
-        # Getting a random restaurant weighed by their relative order amounts
-        random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0].name
-        order, order_description = self.easy_order_generator.generate(random_restaurant)
-        await self.create_order(order, order_description)
+        # Getting a random restaurant wheighed by their relative order amounts
+        random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0]
+        print(random_restaurant)
+        # TODO: Implement Cluckers Algo
 
-    async def create_order(self, order_result: Order, order_message: str) -> None:
+    async def create_order(self, customer_name: str, order_message: str, order_result: Order) -> None:
         """
         Create a new order, sends a message, and stores the result to check.
 
@@ -114,14 +98,9 @@ class OrderQueue:
             order_message (str): The message to send to the Discord thread.
             order_result (Order): The correct result the Order should give
         """
-        if not order_result.customer_information:
-            raise ValueError("missing customer_information")
-
-        dc_tz = f"<t:{int(order_result.penalty_timestamp.timestamp())}:R>"
-        order_message += (
-            f"\n\n:warning: The order should be completed within {dc_tz} seconds or you will get a penalty! :warning:"
-        )
-        discord_message = await self.webhook.send(
+        discord_tz = f"<t:{order_result.penalty_timestamp.timestamp()}:R>"
+        order_message += f" The order should be completed within {discord_tz} seconds or you will get a penalty!"
+        order_message = await self.webhook.send(
             content=order_message,
             username=f"GAME NAME - OrderID: {order_result.customer_information.order_id}",
             avatar_url=generate_random_avatar_url(),
@@ -157,14 +136,17 @@ class OrderQueue:
         await asyncio.sleep(random.randint(10, 20))
         await self.spawn_order()
 
+        # Wait 10-20 Seconds as an order Cooldown
+        order_timeout = random.randint(10, 20)
+        await asyncio.sleep(order_timeout)
+        await self.spawn_order()
+
     async def stop_orders(self) -> None:
         """Stop All Orders (when stopping the game)."""
         self.running = False
-        # TODO: Make sure these cant fail (or catch specific Errors)
-        with suppress(Exception):
+        with suppress(HTTPException, NotFound):
             # Deleting Webhook
             await self.webhook.delete()
-        with suppress(HTTPException, NotFound, AssertionError):
-            # Deleting orders thread
-            assert self.orders_thread
+        with suppress(HTTPException, NotFound):
+            # Deleting Orders Thread
             await self.orders_thread.delete()

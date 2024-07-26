@@ -80,7 +80,7 @@ async def start_game(inter: ApplicationCommandInteraction) -> None:
     await inter.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)
 
     # Spawning Orders
-    await order_queue.spawn_orders()
+    await order_queue.init_orders()
 
     # Load ConditionManager (Orders need to be initialized)
     condition_manager = ConditionManager(order_queue, restaurants)
@@ -107,9 +107,9 @@ async def start_game(inter: ApplicationCommandInteraction) -> None:
         "Please dont ring the bell."
     )
     example_order = Order(customer_information=customer_info, restaurant_name="Pizzaria")
-    example_order.foods["Starters"].append("Pizza Starter0")
-    example_order.foods["Starters"].append("Pizza Starter0")
-    example_order.foods["Main Courses"].append("Main Course0")
+    example_order.foods["Starters"].append("Garlic Knots")
+    example_order.foods["Starters"].append("Garlic Knots")
+    example_order.foods["Main Courses"].append("Veggie Pizza")
 
     # Spawning conditions
     task = asyncio.create_task(condition_manager.spawn_conditions())

@@ -1,9 +1,8 @@
-import asyncio
 import random
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import disnake
@@ -41,8 +40,8 @@ class Order:
     foods: defaultdict[str, list[str]] = field(default_factory=lambda: defaultdict(list[str]))
 
     def __post_init__(self) -> None:
-        # Calculate the order and penalty timestamp
-        self.order_timestamp = datetime.now(tz=UTC)
+        # Recalculate the Order Timestamp to match Initialization
+        self.order_timestamp = datetime.utcnow()  # Timezone doesnt matter
         self.penalty_seconds = random.randint(4 * 60, 6 * 60)
         self.penalty_timestamp = self.order_timestamp + timedelta(seconds=self.penalty_seconds)
 
@@ -274,12 +273,26 @@ class OrderView(disnake.ui.View):
 
         # Getting the correct order
         correct_order = self.restaurant.order_queue.get_order_by_id(self.order.customer_information.order_id)
-        if not correct_order:
-            raise KeyError(f"order with ID {self.order.customer_information.order_id} doesn't exist")
+        assert correct_order
 
-        # Calculating correctness
+        # Calculating Correctness and Discarding Order
         correctness = self.restaurant.check_order(self.order, correct_order)
+        await self.restaurant.order_queue.discard_order(self.order.customer_information.order_id)
         points = round(correctness * 10)  # 100% -> 10p
+
+        # Checking how long Order Completion took
+        assert correct_order.order_timestamp
+        time_taken = (datetime.utcnow() - correct_order.order_timestamp).total_seconds()  # Timezone doesnt matter
+        bonus_interval = 60  # (seconds)
+        completion_message = ""
+        if time_taken <= bonus_interval:
+            points += 5
+            completion_message = "You've completed the order in under a minute and get 5 bonus points! \n"
+        elif time_taken >= correct_order.penalty_seconds:
+            points -= 5
+            completion_message = "You've took to long to complete the order and receive a 5 points penalty! \n"
+
+        add_points(inter.user.id, points)
 
         # Discarding Order in Background
         task = asyncio.create_task(self.restaurant.order_queue.discard_order(self.order.customer_information.order_id))
@@ -306,42 +319,36 @@ class OrderView(disnake.ui.View):
             index=1,
             name=":loudspeaker: :white_check_mark: Info :white_check_mark: :loudspeaker:",
             value=f"**Order placed successfully! Correctness: {round(correctness, 4) * 100}%.\n {completion_message}"
-            f"You gained {points} points; you now have {get_points(interaction.user.id)}!**",
+            f"You gained {points} points; you now have {get_points(inter.user.id)}!**",
             inline=False,
         )
-        await interaction.response.edit_message(embed=embed, view=self.restaurant.restaurants.view)
+        await inter.response.edit_message(embed=embed, view=self.restaurant.restaurants.view)
 
     @disnake.ui.button(label="Show conditions", style=disnake.ButtonStyle.secondary, row=2)
-    async def _show_conditions(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
-        # Create an embed.
+    async def _show_conditions(self, _: disnake.ui.Button, inter: disnake.Message.Interaction) -> None:
         embed = disnake.Embed(title="Current conditions", color=disnake.Color.blue())
-        conditions = self.restaurant.restaurants.condition_manager.order_conditions
-
-        if menu_section := conditions.out_of_stock_sections.get(self.restaurant.name):
+        condition = self.restaurant.restaurants.condition_manager.order_conditions
+        if menu_section := condition.out_of_stock_sections.get(self.restaurant.name):
             embed.add_field(
                 "Out of stock menu sections",
                 f"The following menu sections are out of stock: {', '.join(menu_section)}",
                 inline=False,
             )
-        if sections := conditions.out_of_stock_items.get(self.restaurant.name):
+        if sections := condition.out_of_stock_items.get(self.restaurant.name):
             out_of_stock_items = ", ".join([item for menu in sections.values() for item in menu])
             embed.add_field(
                 "Out of stock menu items",
                 f"The following menu items are out of stock: {out_of_stock_items}",
                 inline=False,
             )
-        if conditions.no_firstname.get(self.restaurant.name):
+        if condition.no_firstname.get(self.restaurant.name):
             embed.add_field("No firstname", "You shouldn't specify the first names of the customers.", inline=False)
-        if conditions.no_delivery.get(self.restaurant.name):
+        if condition.no_delivery.get(self.restaurant.name):
             embed.add_field("No delivery", "Type in `No delivery available` for the address field.", inline=False)
-        if conditions.no_delivery_time.get(self.restaurant.name):
+        if condition.no_delivery_time.get(self.restaurant.name):
             embed.add_field("No delivery time", "You shouldn't specify the delivery time.", inline=False)
-        if conditions.no_extra_information.get(self.restaurant.name):
+        if condition.no_extra_information.get(self.restaurant.name):
             embed.add_field("No extra information", "You shouldn't specify extra informations.", inline=False)
-
-        # Check if there weren't any conditions.
         if not embed.fields:
             embed.description = "No conditions at this time."
-
-        # Reply with the embed.
-        await interaction.response.send_message(ephemeral=True, embed=embed)
+        await inter.response.send_message(ephemeral=True, embed=embed)
