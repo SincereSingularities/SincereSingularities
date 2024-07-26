@@ -74,7 +74,7 @@ class Restaurant:
         Returns:
             float: How correct the order was placed in percentage
         """
-        # Adjust order to conditions
+        # Adjust Order to Conditions
         correct_order = self.restaurants.condition_manager.adjust_order_to_conditions(correct_order)
 
         score = 1.0

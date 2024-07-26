@@ -1,7 +1,6 @@
 import asyncio
-from typing import cast
 
-from disnake import ApplicationCommandInteraction, Intents, Member, TextChannel
+from disnake import ApplicationCommandInteraction, Intents, TextChannel
 from disnake.ext import commands
 
 from sincere_singularities.modules.conditions import ConditionManager
@@ -10,26 +9,7 @@ from sincere_singularities.modules.restaurants_view import Restaurants
 
 intents = Intents.default()
 bot = commands.InteractionBot(intents=intents)
-# This global set is used to ensure that a (non-weak) reference is kept to background tasks created that aren't
-# awaited. These tasks get added to this set, then once they're done, they remove themselves.
-# See RUF006
-background_tasks: set[asyncio.Task[None]] = set()
-
-
-@bot.slash_command(name="clear_webhooks", description="Clears the webhooks in a channel.")
-async def clear_webhooks(interaction: ApplicationCommandInteraction) -> None:
-    """
-    Clears the webhooks in a channel.
-
-    Args:
-        interaction (ApplicationCommandInteraction): The Disnake application command interaction.
-    """
-    # Check if the message was sent in a text channel
-    if not isinstance(interaction.channel, TextChannel):
-        await interaction.response.send_message(
-            "I'm only able to clear webhooks inside of a text channel!", ephemeral=True
-        )
-        return
+background_tasks = set()
 
     # Check user permissions
     # We know this is a Member because interaction.channel is a guild text channel
@@ -78,13 +58,13 @@ async def start_game(interaction: ApplicationCommandInteraction) -> None:
     """
     Start the game.
 
-    Args:
-        interaction (ApplicationCommandInteraction): The Disnake application command interaction.
-    """
-    # Check if the message was sent in a text channel
-    if not isinstance(interaction.channel, TextChannel):
-        await interaction.response.send_message(
-            "You can only start a game session inside of a text channel!", ephemeral=True
+@bot.slash_command(name="start_game")
+async def start_game(inter: ApplicationCommandInteraction) -> None:
+    """Main Command of our Game: /start_game"""
+    # Check if the Message was sent in a Text Channel
+    if not isinstance(inter.channel, TextChannel):
+        await inter.response.send_message(
+            "You can only start a Game Session inside of a Text Channel!", ephemeral=True
         )
         return
 
@@ -94,16 +74,42 @@ async def start_game(interaction: ApplicationCommandInteraction) -> None:
         # Return if we can't start the game (the user is already warned)
         return
     # Load Restaurants
-    condition_manager = ConditionManager(order_queue)
-    restaurants = Restaurants(interaction, order_queue, condition_manager)
+    restaurants = Restaurants(inter, order_queue)
 
-    # Sending start menu
-    await interaction.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)
+    # Sending Start Menu Embed
+    await inter.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)
 
-    # Spawning orders
-    task = asyncio.create_task(order_queue.start_orders())
+    # Spawning Orders
+    await order_queue.spawn_orders()
+
+    # Load ConditionManager (Orders need to be initialized)
+    condition_manager = ConditionManager(order_queue, restaurants)
+    restaurants.condition_manager = condition_manager
+    # Spawning Conditions
+    task = asyncio.create_task(condition_manager.spawn_conditions())
     background_tasks.add(task)
     task.add_done_callback(background_tasks.discard)
+
+    # Creating Temporary example order
+    from sincere_singularities.modules.order import CustomerInfo, Order
+
+    customer_info = CustomerInfo(
+        order_id="Test123",
+        name="Customer Name",
+        address="Customer Address",
+        delivery_time="9 o'clock.",
+        extra_information="Dont ring the bell.",
+    )
+    example_order_text = str(
+        "OrderID: Test123 \n"
+        "Hello, my name is Customer Name. I would like to have 2 Pizza Starter0 and a "
+        "Main Course0 delivered to my house Customer Address at 9 o'clock. "
+        "Please dont ring the bell."
+    )
+    example_order = Order(customer_information=customer_info, restaurant_name="Pizzaria")
+    example_order.foods["Starters"].append("Pizza Starter0")
+    example_order.foods["Starters"].append("Pizza Starter0")
+    example_order.foods["Main Courses"].append("Main Course0")
 
     # Spawning conditions
     task = asyncio.create_task(condition_manager.spawn_conditions())

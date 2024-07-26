@@ -1,5 +1,4 @@
 import random
-import re
 from typing import TYPE_CHECKING
 
 import disnake
@@ -8,6 +7,9 @@ from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.points import buy_restaurant, get_points, has_restaurant
 from sincere_singularities.modules.restaurant import Restaurant
 from sincere_singularities.utils import DISNAKE_COLORS, RESTAURANT_JSON
+
+if TYPE_CHECKING:
+    from sincere_singularities.modules.conditions import ConditionManager
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.conditions import ConditionManager
@@ -146,14 +148,13 @@ class Restaurants:
         """
         Initialize the restaurants.
 
-        Args:
-            interaction (disnake.ApplicationCommandInteraction): The Disnake application command interaction.
-            order_queue (OrderQueue): The order queue.
-            condition_manager (ConditionManager): The condition manager.
-        """
-        self.interaction = interaction
-        self.order_queue: OrderQueue = order_queue
-        self.condition_manager = condition_manager
+    condition_manager: "ConditionManager"
+
+    def __init__(self, inter: disnake.ApplicationCommandInteraction, order_queue: OrderQueue) -> None:
+        self.inter = inter
+        self.order_queue = order_queue
+        # Loading Restaurants
+        self.restaurants_json = load_json("restaurants.json", RestaurantJsonType)
 
     @property
     def view(self) -> RestaurantsView:
@@ -219,4 +220,8 @@ class Restaurants:
     def all_restaurants(self) -> list[Restaurant]:
         """list[Restaurant]: The restaurants list, each restaurant is initialized via its JSON."""
         # Creating Restaurant Objects Based on the Data
-        return [Restaurant(self, restaurant) for restaurant in RESTAURANT_JSON]
+        return [
+            Restaurant(self, restaurant)
+            for restaurant in self.restaurants_json
+            if has_restaurant(self.inter.user.id, restaurant.name)
+        ]

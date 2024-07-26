@@ -48,23 +48,10 @@ class OrderQueue:
         self.user = interaction.user
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
         self.running = False
-        self.webhook = webhook
-        self.easy_order_generator = OrderGenerator("easy")
-        self.orders_thread: Thread | None = None
 
-    @classmethod
-    async def new(cls, interaction: ApplicationCommandInteraction) -> Self | None:
-        """
-        Create a new order queue.
-
-        Args:
-            interaction (ApplicationCommandInteraction): The application command interaction.
-
-        Returns:
-            Self | None: The new order queue, or None if a webhook couldn't be created.
-        """
-        if not isinstance(interaction.channel, TextChannel):
-            raise TypeError("interaction.channel should be TextChannel")
+    async def spawn_orders(self) -> None:
+        """Start the orders queue. Spawn a new Webhook and Order Thread"""
+        # Creating the Order Webhook
         try:
             webhook = await interaction.channel.create_webhook(name="GAME NAME Order Webhook")
         except CommandInvokeError:
@@ -77,6 +64,8 @@ class OrderQueue:
             interaction=interaction,
             webhook=webhook,
         )
+        await self.orders_thread.add_user(self.user)
+        self.running = True
 
     async def start_orders(self) -> None:
         """Start the orders queue. Spawns three orders."""
@@ -169,10 +158,11 @@ class OrderQueue:
         await self.spawn_order()
 
     async def stop_orders(self) -> None:
-        """Stop all orders (when stopping the game)."""
+        """Stop All Orders (when stopping the game)."""
         self.running = False
-        with suppress(HTTPException, NotFound):
-            # Deleting webhook
+        # TODO: Make sure these cant fail (or catch specific Errors)
+        with suppress(Exception):
+            # Deleting Webhook
             await self.webhook.delete()
         with suppress(HTTPException, NotFound, AssertionError):
             # Deleting orders thread
