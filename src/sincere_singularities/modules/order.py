@@ -58,24 +58,29 @@ class CustomerInformationModal(disnake.ui.Modal):
             order_view (OrderView): The order view.
         """
         self.order_view = order_view
+        pre_customer_information = self.order_view.order.customer_information
+
         components = [
             disnake.ui.TextInput(
                 label="Order ID",
                 custom_id="order_id",
                 style=TextInputStyle.short,
                 max_length=64,
+                value=pre_customer_information.order_id if pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Name",
                 custom_id="name",
                 style=TextInputStyle.short,
                 max_length=64,
+                value=pre_customer_information.name if pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Address",
                 custom_id="address",
                 style=TextInputStyle.short,
                 max_length=64,
+                value=pre_customer_information.address if pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Time of delivery",
@@ -83,6 +88,7 @@ class CustomerInformationModal(disnake.ui.Modal):
                 style=TextInputStyle.short,
                 required=False,
                 max_length=64,
+                value=pre_customer_information.delivery_time if pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Extra information",
@@ -90,6 +96,7 @@ class CustomerInformationModal(disnake.ui.Modal):
                 style=TextInputStyle.paragraph,
                 required=False,
                 max_length=1028,
+                value=pre_customer_information.extra_information if pre_customer_information else None,
             ),
         ]
         super().__init__(title="Customer information", components=components)
