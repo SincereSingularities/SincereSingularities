@@ -35,8 +35,6 @@ ORDER_TEMPLATES = [
 class OrderQueue:
     """The class for managing the order queue. Orders can be spawned and deleted from here."""
 
-    orders_thread: Thread | None = None
-
     def __init__(self, interaction: ApplicationCommandInteraction, webhook: Webhook) -> None:
         """
         Initialize the order queue.
@@ -52,6 +50,7 @@ class OrderQueue:
         self.running = False
         self.webhook = webhook
         self.easy_order_generator = OrderGenerator("easy")
+        self.orders_thread: Thread | None = None
 
     @classmethod
     async def new(cls, interaction: ApplicationCommandInteraction) -> Self | None:

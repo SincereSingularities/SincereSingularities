@@ -9,7 +9,7 @@ from sincere_singularities.data.extra_informations import EXTRA_INFORMATIONS_WIT
 from sincere_singularities.data.intros_outros import INTROS, OUTROS
 from sincere_singularities.data.noise import NOISE
 from sincere_singularities.modules.order import CustomerInformation, Order
-from sincere_singularities.utils import RESTAURANT_JSON
+from sincere_singularities.modules.points import get_restaurant_by_name
 
 ORDER_ID_CHARS = string.ascii_lowercase + string.digits
 INITIAL_DISH_PROBABILITY = {
@@ -154,11 +154,10 @@ class OrderGenerator:
         return order, order_description
 
     def _generate_menu(self, order: Order, restaurant_name: str) -> Order:
-        restaurant = next(_restaurant for _restaurant in RESTAURANT_JSON if _restaurant.name == restaurant_name)
+        restaurant = get_restaurant_by_name(restaurant_name)
         # Get Probability to Generate Multiple Dishes in one Order
         multiple_dish_probabilities = MULTIPLE_DISH_PROBABILITY[self.difficulty]
 
-        # TODO: Don't add a Menu Item from every section everytime
         # Looping through the Menu Sections
         for dish_type in ("Starters", "Main Courses", "Desserts", "Drinks"):
             if random.random() > INITIAL_DISH_PROBABILITY[self.difficulty][dish_type]:

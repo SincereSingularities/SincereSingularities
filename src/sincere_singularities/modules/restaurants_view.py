@@ -47,18 +47,16 @@ class RestaurantPurchaseView(disnake.ui.View):
 class RestaurantsView(disnake.ui.View):
     """View subclass for choosing the restaurant."""
 
-    def __init__(self, restaurants: "Restaurants", embeds: list[disnake.Embed], index: int = 0) -> None:
+    def __init__(self, restaurants: "Restaurants", index: int = 0) -> None:
         """
         Initialize the restaurants view.
 
         Args:
             restaurants (Restaurants): The restaurants.
-            embeds (list[disnake.Embed]): The restaurant embeds.
             index (int, optional): The index to start from. Defaults to 0.
         """
         super().__init__(timeout=None)
         self.restaurants = restaurants
-        self.embeds = embeds
         self.index = index
 
         # Sets the footer of the embeds with their respective page numbers.
@@ -66,6 +64,11 @@ class RestaurantsView(disnake.ui.View):
             embed.set_footer(text=f"Restaurant {i + 1} of {len(self.embeds)}")
 
         self.update_state()
+
+    @property
+    def embeds(self) -> list[disnake.Embed]:
+        """list[disnake.Embed]: The embeds of the restaurants (on the restaurant selection screen)."""
+        return self.restaurants.embeds
 
     def update_state(self) -> None:
         """Updating the State of the RestaurantsView"""
@@ -155,7 +158,7 @@ class Restaurants:
     @property
     def view(self) -> RestaurantsView:
         """RestaurantsView: The view object for the restaurants."""
-        return RestaurantsView(self, self.embeds)
+        return RestaurantsView(self)
 
     @property
     def embeds(self) -> list[disnake.Embed]:
