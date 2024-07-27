@@ -16,7 +16,7 @@ from disnake import (
 from disnake.ext.commands.errors import CommandInvokeError
 
 from sincere_singularities.modules.order import Order
-from sincere_singularities.modules.order_generator import OrderGenerator
+from sincere_singularities.modules.order_generator import Difficulty, OrderGenerator
 from sincere_singularities.modules.points import has_restaurant
 from sincere_singularities.utils import RESTAURANT_JSON, RestaurantsType, generate_random_avatar_url
 
@@ -47,9 +47,10 @@ class OrderQueue:
         self.interaction = interaction
         self.user = interaction.user
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
+        self.number_of_orders = 0
         self.running = False
         self.webhook = webhook
-        self.easy_order_generator = OrderGenerator("easy")
+        self.order_generator = OrderGenerator(Difficulty.EASY)
         self.orders_thread: Thread | None = None
 
     @classmethod
@@ -114,7 +115,7 @@ class OrderQueue:
 
         # Getting a random restaurant weighed by their relative order amounts
         random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0].name
-        order, order_description = self.easy_order_generator.generate(random_restaurant)
+        order, order_description = self.order_generator.generate(random_restaurant)
         await self.create_order(order, order_description)
 
     async def create_order(self, order_result: Order, order_message: str) -> None:
@@ -163,6 +164,13 @@ class OrderQueue:
             order_id (str): The ID of the order to discard.
         """
         del self.orders[order_id]
+        
+        # Increase difficulty every 10 completed orders
+        self.number_of_orders += 1
+        if self.number_of_orders == 10:
+            self.order_generator.difficulty = Difficulty.MEDIUM
+        if self.number_of_orders == 20:
+            self.order_generator.difficulty = Difficulty.HARD
 
         # Wait 10-20 Seconds as an order cooldown
         await asyncio.sleep(random.randint(10, 20))
