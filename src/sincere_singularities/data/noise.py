@@ -1,7 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
 
 @dataclass
 class EmbeddableNoiseFoods:
+    """EmbeddableNoiseFoods"""
     starters: list[str]
     main: list[str]
     desserts: list[str]
@@ -9,6 +11,7 @@ class EmbeddableNoiseFoods:
 
 @dataclass
 class EmbeddableNoise:
+    """EmbeddableNoise"""
     addresses: list[str]
     foods: EmbeddableNoiseFoods
     times: list[str]
@@ -16,6 +19,7 @@ class EmbeddableNoise:
 
 @dataclass
 class NoiseData:
+    """NoiseData"""
     noise: list[str]
     relevant_noise: list[str]
     embeddable_noise: EmbeddableNoise
