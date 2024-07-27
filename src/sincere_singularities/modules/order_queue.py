@@ -1,5 +1,6 @@
 import asyncio
 import random
+from collections import defaultdict
 from contextlib import suppress
 from typing import Self
 
@@ -16,20 +17,49 @@ from disnake import (
 from disnake.ext.commands.errors import CommandInvokeError
 
 from sincere_singularities.modules.order import Order
-from sincere_singularities.modules.order_generator import OrderGenerator
+from sincere_singularities.modules.order_generator import Difficulty, OrderGenerator
 from sincere_singularities.modules.points import has_restaurant
 from sincere_singularities.utils import RESTAURANT_JSON, RestaurantsType, generate_random_avatar_url
 
-# Temporary
-ORDER_TEMPLATES = [
-    (
-        "Hello, I'd like to place an order for delivery. My name is {CUSTOMER_NAME}, and I live at {CUSTOMER_ADDRESS}."
-        " I'd like to order {ORDER_ITEMS}. Oh, and by the way, I have a cat named Fluffy and I don't like it when"
-        " people ring the doorbell, so please make sure to just knock politely. Please deliver it at {DELIVERY_TIME}."
-        " Thank you.",
-        "Don't ring the bell",
-    )
-]
+# vvv temporary until #6 gets merged vvv
+
+temporary_database: defaultdict[int, int] = defaultdict(int)
+
+
+def get_number_of_orders(user_id: int) -> int:
+    """
+    Get the number of orders by a user.
+
+    Args:
+        user_id (int): The user's ID.
+
+    Returns:
+        int: The number of orders completed.
+    """
+    return temporary_database[user_id]
+
+
+def add_number_of_orders(user_id: int) -> None:
+    """
+    Add to the number of orders.
+
+    Args:
+        user_id (int): The user's ID.
+    """
+    temporary_database[user_id] += 1
+
+
+def remove_number_of_orders(user_id: int) -> None:
+    """
+    Remove/reset the number of orders of a user.
+
+    Args:
+        user_id (int): The user's ID.
+    """
+    del temporary_database[user_id]
+
+
+# ^^^ temporary ^^^
 
 
 class OrderQueue:
@@ -49,7 +79,7 @@ class OrderQueue:
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
         self.running = False
         self.webhook = webhook
-        self.easy_order_generator = OrderGenerator("easy")
+        self.order_generator = OrderGenerator(Difficulty.EASY)
         self.orders_thread: Thread | None = None
 
     @classmethod
@@ -114,7 +144,7 @@ class OrderQueue:
 
         # Getting a random restaurant weighed by their relative order amounts
         random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0].name
-        order, order_description = self.easy_order_generator.generate(random_restaurant)
+        order, order_description = self.order_generator.generate(random_restaurant)
         await self.create_order(order, order_description)
 
     async def create_order(self, order_result: Order, order_message: str) -> None:
@@ -163,6 +193,14 @@ class OrderQueue:
             order_id (str): The ID of the order to discard.
         """
         del self.orders[order_id]
+
+        # Increase difficulty every 10 completed orders
+        add_number_of_orders(self.user.id)
+        orders = get_number_of_orders(self.user.id)
+        if orders == 10:
+            self.order_generator.difficulty = Difficulty.MEDIUM
+        elif orders == 20:
+            self.order_generator.difficulty = Difficulty.HARD
 
         # Wait 10-20 Seconds as an order cooldown
         await asyncio.sleep(random.randint(10, 20))

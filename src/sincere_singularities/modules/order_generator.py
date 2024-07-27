@@ -1,7 +1,7 @@
 import random
 import string
 from datetime import UTC, datetime, timedelta
-from typing import Literal
+from enum import Enum, auto
 
 from faker import Faker
 
@@ -11,21 +11,30 @@ from sincere_singularities.data.noise import NOISE
 from sincere_singularities.modules.order import CustomerInformation, Order
 from sincere_singularities.modules.points import get_restaurant_by_name
 
+
+class Difficulty(Enum):
+    """The difficulty of the game."""
+
+    EASY = auto()
+    MEDIUM = auto()
+    HARD = auto()
+
+
 ORDER_ID_CHARS = string.ascii_lowercase + string.digits
 INITIAL_DISH_PROBABILITY = {
-    "easy": {
+    Difficulty.EASY: {
         "Starters": 0.7,
         "Main Courses": 1,
         "Desserts": 0.6,
         "Drinks": 0.4,
     },
-    "medium": {
+    Difficulty.MEDIUM: {
         "Starters": 0.9,
         "Main Courses": 1,
         "Desserts": 0.8,
         "Drinks": 0.7,
     },
-    "hard": {
+    Difficulty.HARD: {
         "Starters": 1,
         "Main Courses": 1,
         "Desserts": 0.9,
@@ -33,19 +42,19 @@ INITIAL_DISH_PROBABILITY = {
     },
 }
 MULTIPLE_DISH_PROBABILITY = {
-    "easy": {
+    Difficulty.EASY: {
         "Starters": 0.2,
         "Main Courses": 0.1,
         "Desserts": 0.15,
         "Drinks": 0.05,
     },
-    "medium": {
+    Difficulty.MEDIUM: {
         "Starters": 0.3,
         "Main Courses": 0.2,
         "Desserts": 0.35,
         "Drinks": 0.1,
     },
-    "hard": {
+    Difficulty.HARD: {
         "Starters": 0.5,
         "Main Courses": 0.6,
         "Desserts": 0.75,
@@ -53,15 +62,15 @@ MULTIPLE_DISH_PROBABILITY = {
     },
 }
 CUSTOMER_INFORMATION_PROBABILITY = {
-    "easy": {
+    Difficulty.EASY: {
         "Time": 0.4,
         "Extra Information": 0.3,
     },
-    "medium": {
+    Difficulty.MEDIUM: {
         "Time": 0.6,
         "Extra Information": 0.5,
     },
-    "hard": {
+    Difficulty.HARD: {
         "Time": 0.9,
         "Extra Information": 0.7,
     },
@@ -107,11 +116,18 @@ def _generate_delivery_time() -> str:
 class OrderGenerator:
     """The OrderGenerator Class to generate Randomized Order Information and Noisified Order Descriptions"""
 
-    def __init__(self, difficulty: Literal["easy", "medium", "hard"]) -> None:
+    def __init__(self, difficulty: Difficulty) -> None:
         self.difficulty = difficulty
-        # Load Settings
-        self.delivery_time_probability = CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Time"]
-        self.extra_information_probability = CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Extra Information"]
+
+    @property
+    def delivery_time_probability(self) -> float:
+        """float: The probability of delivery time being specified."""
+        return CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Time"]
+
+    @property
+    def extra_information_probability(self) -> float:
+        """float: The probability of extra information being specified."""
+        return CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Extra Information"]
 
     def generate(self, restaurant_name: str) -> tuple[Order, str]:
         """
@@ -178,9 +194,9 @@ class OrderGenerator:
     def _generate_order_paragraph(self, order_description: str, paragraph: list[str]) -> str:
         # Adding Noise (Quantity) based on Difficulty
         noise_quantity = 0
-        if self.difficulty == "medium":
+        if self.difficulty == Difficulty.MEDIUM:
             noise_quantity = random.randint(0, 2)
-        elif self.difficulty == "hard":
+        elif self.difficulty == Difficulty.HARD:
             noise_quantity = random.randint(1, 5)
 
         # Adding Noise to Paragraph
@@ -192,7 +208,7 @@ class OrderGenerator:
                 paragraph.append(random.choice(NOISE.noise))
 
         # Shuffling Items on harder difficulties
-        if self.difficulty != "easy":
+        if self.difficulty != Difficulty.EASY:
             random.shuffle(paragraph)
         # Joining together to a complete Paragraph.
         order_description += " ".join(paragraph) + "\n"
