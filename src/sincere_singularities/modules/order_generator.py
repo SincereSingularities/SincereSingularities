@@ -232,7 +232,7 @@ class OrderGenerator:
 
     def _generate_order_description(self, order: Order, has_delivery_time: bool, has_extra_information: bool) -> str:
         # We'll add the Order Description to this string
-        order_description = ""
+        order_description = f":id: **Customer ID:** `{order.customer_information.order_id}`\n\n"
         # Whether to have the Customer Name in the Introduction
         customer_name_in_intro = random.randint(0, 1)
 
