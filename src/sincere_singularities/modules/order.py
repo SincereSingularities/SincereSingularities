@@ -59,11 +59,30 @@ class CustomerInformationModal(disnake.ui.Modal):
         """
         self.order_view = order_view
         components = [
-            disnake.ui.TextInput(label="Order ID", custom_id="order_id", style=TextInputStyle.short, max_length=64),
-            disnake.ui.TextInput(label="Name", custom_id="name", style=TextInputStyle.short, max_length=64),
-            disnake.ui.TextInput(label="Address", custom_id="address", style=TextInputStyle.short, max_length=64),
             disnake.ui.TextInput(
-                label="Time of delivery", custom_id="time", style=TextInputStyle.short, required=False, max_length=64
+                label="Order ID",
+                custom_id="order_id",
+                style=TextInputStyle.short,
+                max_length=64,
+            ),
+            disnake.ui.TextInput(
+                label="Name",
+                custom_id="name",
+                style=TextInputStyle.short,
+                max_length=64,
+            ),
+            disnake.ui.TextInput(
+                label="Address",
+                custom_id="address",
+                style=TextInputStyle.short,
+                max_length=64,
+            ),
+            disnake.ui.TextInput(
+                label="Time of delivery",
+                custom_id="time",
+                style=TextInputStyle.short,
+                required=False,
+                max_length=64,
             ),
             disnake.ui.TextInput(
                 label="Extra information",
@@ -112,7 +131,13 @@ class CustomerInformationModal(disnake.ui.Modal):
 class MenuItemButton(disnake.ui.Button):
     """A button for adding a specific menu item."""
 
-    def __init__(self, menu_item_view: "MenuItemView", order: Order, menu_section: str, menu_item: str) -> None:
+    def __init__(
+        self,
+        menu_item_view: "MenuItemView",
+        order: Order,
+        menu_section: str,
+        menu_item: str,
+    ) -> None:
         """
         Initialize the menu item button.
 
@@ -179,7 +204,12 @@ class MenuSectionButton(disnake.ui.Button):
     """The button for accessing a menu section (e.g. Main Courses)"""
 
     def __init__(
-        self, restaurant: "Restaurant", order_view: "OrderView", order: Order, menu_section: str, button_index: int
+        self,
+        restaurant: "Restaurant",
+        order_view: "OrderView",
+        order: Order,
+        menu_section: str,
+        button_index: int,
     ) -> None:
         """
         Initialize the menu section button.
@@ -192,7 +222,12 @@ class MenuSectionButton(disnake.ui.Button):
             button_index (int): The button's index.
         """
         row_index = 0 if button_index <= 1 else 1
-        super().__init__(label=menu_section, style=ButtonStyle.primary, row=row_index, custom_id=menu_section)
+        super().__init__(
+            label=menu_section,
+            style=ButtonStyle.primary,
+            row=row_index,
+            custom_id=menu_section,
+        )
         self.restaurant = restaurant
         self.order_view = order_view
         self.order = order
@@ -331,13 +366,29 @@ class OrderView(disnake.ui.View):
                 inline=False,
             )
         if conditions.no_firstname.get(self.restaurant.name):
-            embed.add_field("No firstname", "You shouldn't specify the first names of the customers.", inline=False)
+            embed.add_field(
+                "No firstname",
+                "You shouldn't specify the first names of the customers.",
+                inline=False,
+            )
         if conditions.no_delivery.get(self.restaurant.name):
-            embed.add_field("No delivery", "Type in `No delivery available` for the address field.", inline=False)
+            embed.add_field(
+                "No delivery",
+                "Type in `No delivery available` for the address field.",
+                inline=False,
+            )
         if conditions.no_delivery_time.get(self.restaurant.name):
-            embed.add_field("No delivery time", "You shouldn't specify the delivery time.", inline=False)
+            embed.add_field(
+                "No delivery time",
+                "You shouldn't specify the delivery time.",
+                inline=False,
+            )
         if conditions.no_extra_information.get(self.restaurant.name):
-            embed.add_field("No extra information", "You shouldn't specify extra informations.", inline=False)
+            embed.add_field(
+                "No extra information",
+                "You shouldn't specify extra informations.",
+                inline=False,
+            )
 
         # Check if there weren't any conditions.
         if not embed.fields:

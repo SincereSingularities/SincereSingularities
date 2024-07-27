@@ -5,7 +5,11 @@ from typing import TYPE_CHECKING
 from disnake import MessageInteraction
 
 from sincere_singularities.modules.order import Order, OrderView
-from sincere_singularities.utils import RestaurantJsonType, check_pattern_similarity, compare_sentences
+from sincere_singularities.utils import (
+    RestaurantJsonType,
+    check_pattern_similarity,
+    compare_sentences,
+)
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.order_queue import OrderQueue
@@ -106,13 +110,15 @@ class Restaurant:
 
         # Delivery time
         delivery_time_check = compare_sentences(
-            correct_customer_information.delivery_time, customer_information.delivery_time
+            correct_customer_information.delivery_time,
+            customer_information.delivery_time,
         )
         score -= score_percentile + (-score_percentile * delivery_time_check)
 
         # Extra information
         extra_info_check = compare_sentences(
-            correct_customer_information.extra_information, customer_information.extra_information
+            correct_customer_information.extra_information,
+            customer_information.extra_information,
         )
         score -= score_percentile + (-score_percentile * extra_info_check)
 

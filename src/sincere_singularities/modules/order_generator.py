@@ -216,7 +216,11 @@ class OrderGenerator:
         return order_description
 
     def _generate_menu_items_description(
-        self, order: Order, order_description: str, menu_section: str, string_template: str
+        self,
+        order: Order,
+        order_description: str,
+        menu_section: str,
+        string_template: str,
     ) -> str:
         # Getting Non-Duplicate Set of Menu Section Items
         menu_section_set = set(order.foods[menu_section])
@@ -262,7 +266,7 @@ class OrderGenerator:
         # Menu Items paragraph
         menu_items_paragraph = [
             starters_menu_template if order.foods["Starters"] else "",  # Starters
-            main_courses_menu_template if order.foods["Main Courses"] else "",  # Main Courses
+            (main_courses_menu_template if order.foods["Main Courses"] else ""),  # Main Courses
             desserts_menu_template if order.foods["Desserts"] else "",  # Desserts
             drinks_menu_template if order.foods["Drinks"] else "",  # Drinks
         ]

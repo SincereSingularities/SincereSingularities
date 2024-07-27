@@ -109,10 +109,22 @@ class ConditionManager:
                     menu_item = random.choice(restaurant.menu[menu_section])
 
             # Apply the condition.
-            await self.apply_condition(condition, restaurant.name, despawn_sleep_seconds, menu_section, menu_item)
+            await self.apply_condition(
+                condition,
+                restaurant.name,
+                despawn_sleep_seconds,
+                menu_section,
+                menu_item,
+            )
             # Create and store the created delete task.
             task = asyncio.create_task(
-                self.delete_condition(condition, restaurant.name, despawn_sleep_seconds, menu_section, menu_item)
+                self.delete_condition(
+                    condition,
+                    restaurant.name,
+                    despawn_sleep_seconds,
+                    menu_section,
+                    menu_item,
+                )
             )
             background_tasks.add(task)
             task.add_done_callback(background_tasks.discard)
