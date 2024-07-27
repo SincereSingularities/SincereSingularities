@@ -101,8 +101,10 @@ ignore = [
     "S101",
     # Function Arguments
     "PLR0913",
-    # UTC Timezones
-    "DTZ003"
+    # Magic Values
+    "PLR2004",
+    # Positional Boolean
+    "FBT001"
 ]
 
 [tool.ruff.lint.pydocstyle]
