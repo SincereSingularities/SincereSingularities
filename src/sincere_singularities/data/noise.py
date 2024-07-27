@@ -4,25 +4,31 @@ from dataclasses import dataclass
 @dataclass
 class EmbeddableNoiseFoods:
     """EmbeddableNoiseFoods"""
+
     starters: list[str]
     main: list[str]
     desserts: list[str]
     drinks: list[str]
 
+
 @dataclass
 class EmbeddableNoise:
     """EmbeddableNoise"""
+
     addresses: list[str]
     foods: EmbeddableNoiseFoods
     times: list[str]
     restaurants: list[str]
 
+
 @dataclass
 class NoiseData:
     """NoiseData"""
+
     noise: list[str]
     relevant_noise: list[str]
     embeddable_noise: EmbeddableNoise
+
 
 NOISE = NoiseData(
     noise=[

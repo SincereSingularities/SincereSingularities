@@ -79,9 +79,7 @@ class RestaurantsView(disnake.ui.View):
         points = get_points(self.restaurants.interaction.user.id)
         description = self.embeds[self.index].description
         assert description
-        self.embeds[self.index].description = re.sub(
-            r"you have \d+", f"you have {points}", description
-        )
+        self.embeds[self.index].description = re.sub(r"you have \d+", f"you have {points}", description)
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary, row=0)
     async def _prev_page(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
