@@ -1,5 +1,5 @@
-from collections.abc import Iterable
 import json
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -84,4 +84,12 @@ if __name__ == "__main__":
         orders = json.load(f)
 
     print(orders)
-    order.update_order("order124", {"name": "John Doe", "address": "1234 Main St", "delivery_time": "ASAP", "extra_information": "N/A"})
+    order.update_order(
+        "order124",
+        {
+            "name": "John Doe",
+            "address": "1234 Main St",
+            "delivery_time": "ASAP",
+            "extra_information": "N/A",
+        },
+        )
