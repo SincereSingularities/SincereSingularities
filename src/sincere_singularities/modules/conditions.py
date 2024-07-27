@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum, auto
 
 from sincere_singularities.modules.order import CustomerInformation, Order
+from sincere_singularities.modules.order_generator import Difficulty
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.utils import RESTAURANT_JSON
 
@@ -40,6 +41,12 @@ CONDITIONS_PROBABILITIES = {
     ConditionType.NO_DELIVERY: 0.1,
     ConditionType.NO_DELIVERY_TIME: 0.1,
     ConditionType.NO_EXTRA_INFORMATION: 0.1,
+}
+
+CONDITION_FREQUENCIES = {
+    Difficulty.EASY: (120, 240),
+    Difficulty.MEDIUM: (60, 120),
+    Difficulty.HARD: (30, 60),
 }
 
 
@@ -80,8 +87,10 @@ class ConditionManager:
     async def spawn_conditions(self) -> None:
         """Constantly spawn conditions on the restaurants while the game is running."""
         while self.order_queue.running:
-            spawn_sleep_seconds = random.randint(60, 120)
-            despawn_sleep_seconds = float(random.randint(60, 120))
+            spawn_sleep_seconds = random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generator.difficulty])
+            despawn_sleep_seconds = float(
+                random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generator.difficulty])
+            )
             await asyncio.sleep(spawn_sleep_seconds)
 
             # Choose a random condition with the provided probabilities.
