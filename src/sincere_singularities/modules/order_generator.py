@@ -188,9 +188,9 @@ class OrderGenerator:
         for i in range(noise_quantity):
             # Only generate `relevant_noise` if the noise_quantity is more than 0
             if i:
-                paragraph.append(random.choice(NOISE["relevant_noise"]))
+                paragraph.append(random.choice(NOISE.relevant_noise))
             else:
-                paragraph.append(random.choice(NOISE["noise"]))
+                paragraph.append(random.choice(NOISE.noise))
 
         # Shuffling Items on harder difficulties
         if self.difficulty != "easy":
@@ -219,14 +219,14 @@ class OrderGenerator:
 
         # Generating Embeddable Noise Fillers, which are string templates which
         # we can inject the Customer Information into
-        address_template = random.choice(NOISE["embeddable_noise"]["addresses"])
-        restaurant_name_template = random.choice(NOISE["embeddable_noise"]["restaurants"])
-        delivery_time_template = random.choice(NOISE["embeddable_noise"]["times"]) if has_delivery_time else ""
+        address_template = random.choice(NOISE.embeddable_noise.addresses)
+        restaurant_name_template = random.choice(NOISE.embeddable_noise.restaurants)
+        delivery_time_template = random.choice(NOISE.embeddable_noise.times) if has_delivery_time else ""
         # Menu Templates
-        starters_menu_template = random.choice(NOISE["embeddable_noise"]["foods"]["starters"])
-        main_courses_menu_template = random.choice(NOISE["embeddable_noise"]["foods"]["main"])
-        desserts_menu_template = random.choice(NOISE["embeddable_noise"]["foods"]["desserts"])
-        drinks_menu_template = random.choice(NOISE["embeddable_noise"]["foods"]["drinks"])
+        starters_menu_template = random.choice(NOISE.embeddable_noise.foods.starters)
+        main_courses_menu_template = random.choice(NOISE.embeddable_noise.foods.main)
+        desserts_menu_template = random.choice(NOISE.embeddable_noise.foods.desserts)
+        drinks_menu_template = random.choice(NOISE.embeddable_noise.foods.drinks)
 
         # Introduction (potentially with the Customer Name)
         if customer_name_in_intro:
@@ -261,6 +261,7 @@ class OrderGenerator:
             order_description += random.choice(OUTROS["outros_without_name"])
 
         # Format the Final Description, Replace Template Strings with actual Order Information
+        assert order.restaurant_name
         order_description = order_description.replace("<RESTAURANT>", order.restaurant_name)
 
         # Formatting Customer Information

@@ -77,8 +77,10 @@ class RestaurantsView(disnake.ui.View):
         else:
             self._enter_restaurant.label = "Buy"
         points = get_points(self.restaurants.interaction.user.id)
+        description = self.embeds[self.index].description
+        assert description
         self.embeds[self.index].description = re.sub(
-            r"you have \d+", f"you have {points}", self.embeds[self.index].description
+            r"you have \d+", f"you have {points}", description
         )
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary, row=0)

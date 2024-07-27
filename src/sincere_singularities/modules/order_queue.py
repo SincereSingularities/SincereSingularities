@@ -87,6 +87,7 @@ class OrderQueue:
         self.orders_thread = await self.interaction.channel.create_thread(
             name="Orders Thread", type=ChannelType.public_thread, invitable=False
         )
+        assert self.orders_thread  # MYPY can be stupid at times...
         await self.orders_thread.add_user(self.interaction.user)
 
         # Spawn 3 Orders at the start, which get refreshed after one order is done
@@ -174,6 +175,7 @@ class OrderQueue:
         with suppress(HTTPException, NotFound):
             # Deleting webhook
             await self.webhook.delete()
-        with suppress(HTTPException, NotFound):
+        with suppress(HTTPException, NotFound, AssertionError):
             # Deleting orders thread
+            assert self.orders_thread
             await self.orders_thread.delete()

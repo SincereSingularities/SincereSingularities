@@ -1,5 +1,27 @@
-NOISE = {
-    "noise": [
+from dataclasses import dataclass, field
+
+@dataclass
+class EmbeddableNoiseFoods:
+    starters: list[str]
+    main: list[str]
+    desserts: list[str]
+    drinks: list[str]
+
+@dataclass
+class EmbeddableNoise:
+    addresses: list[str]
+    foods: EmbeddableNoiseFoods
+    times: list[str]
+    restaurants: list[str]
+
+@dataclass
+class NoiseData:
+    noise: list[str]
+    relevant_noise: list[str]
+    embeddable_noise: EmbeddableNoise
+
+NOISE = NoiseData(
+    noise=[
         "It's such a sunny day today, perfect for a walk in the park.",
         "Yesterday was unbelievable with how much it rained, flooding the streets.",
         "The sky looks so clear and blue, not a cloud in sight.",
@@ -121,7 +143,7 @@ NOISE = {
         "Enjoyed a quiet evening reading my favorite book, so relaxing.",
         "Organize my kitchen pantry this weekend, it's getting messy.",
     ],
-    "relevant_noise": [
+    relevant_noise=[
         "My neighbor at 123 Darwin Avenue threw a huge party last night.",
         "I used to live at 456 Elm Street when I was a kid.",
         "We visited my aunt at 789 Maple Lane during the holidays.",
@@ -203,8 +225,8 @@ NOISE = {
         "We toured the museums in Berlin, Germany, last spring.",
         "I recently met a writer named Charles Moore at a book signing.",
     ],
-    "embeddable_noise": {
-        "addresses": [
+    embeddable_noise=EmbeddableNoise(
+        addresses=[
             "Can you deliver this to <ADDRESS>?",
             "I'd like to order this to <ADDRESS>.",
             "Please send this to <ADDRESS>.",
@@ -226,8 +248,8 @@ NOISE = {
             "This order is for <ADDRESS>.",
             "Can you make sure this gets to <ADDRESS>?",
         ],
-        "foods": {
-            "starters": [
+        foods=EmbeddableNoiseFoods(
+            starters=[
                 "I'd like to order <STARTERS>.",
                 "Can I have <STARTERS> with that?",
                 "I'd like to start with <STARTERS>.",
@@ -236,7 +258,7 @@ NOISE = {
                 "Can you add <STARTERS> to that?",
                 "Please add <STARTERS> to my meal.",
             ],
-            "main": [
+            main=[
                 "Please add <MAIN> to my order.",
                 "I want <MAIN> as my main dish.",
                 "For my main course, I'll have <MAIN>.",
@@ -245,7 +267,7 @@ NOISE = {
                 "I'd like to order <MAIN> for dinner.",
                 "I'd like <MAIN> as my main course.",
             ],
-            "desserts": [
+            desserts=[
                 "I'd like <DESSERTS> for dessert.",
                 "Please include <DESSERTS> in my order.",
                 "I'll take <DESSERTS> for dessert.",
@@ -254,7 +276,7 @@ NOISE = {
                 "I'll take <DESSERTS> to finish.",
                 "For dessert, I'll have <DESSERTS>.",
             ],
-            "drinks": [
+            drinks=[
                 "I'd like to order <DRINKS> beverage.",
                 "Can I have <DRINKS> with that?",
                 "Please include <DRINKS> beverage with my meal.",
@@ -263,8 +285,8 @@ NOISE = {
                 "I'll take <DRINKS> with my meal.",
                 "Please add <DRINKS> beverage to my order.",
             ],
-        },
-        "times": [
+        ),
+        times=[
             "I need this delivered by <TIME>.",
             "Can I schedule the delivery for <TIME>?",
             "I'd like the food to arrive by <TIME>.",
@@ -286,7 +308,7 @@ NOISE = {
             "I'd like my food to arrive at <TIME>.",
             "Please ensure delivery by <TIME>.",
         ],
-        "restaurants": [
+        restaurants=[
             "I'd like to place my order from <RESTAURANT>.",
             "Can I get this meal from <RESTAURANT>?",
             "Please order this from <RESTAURANT>.",
@@ -308,5 +330,5 @@ NOISE = {
             "I'd like to place a dinner order at <RESTAURANT>.",
             "Please arrange for delivery from <RESTAURANT>.",
         ],
-    },
-}
+    ),
+)
