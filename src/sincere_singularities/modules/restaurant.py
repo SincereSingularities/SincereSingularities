@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from disnake import MessageInteraction
 
 from sincere_singularities.modules.order import Order, OrderView
-from sincere_singularities.utils import RestaurantJson, check_pattern_similarity, compare_sentences
+from sincere_singularities.utils import RestaurantJsonType, check_pattern_similarity, compare_sentences
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.order_queue import OrderQueue
@@ -34,7 +34,7 @@ def count_differences(first_iterable: Iterable[object], second_iterable: Iterabl
 class Restaurant:
     """Represents a single restaurant."""
 
-    def __init__(self, restaurants: "Restaurants", restaurant_json: RestaurantJson) -> None:
+    def __init__(self, restaurants: "Restaurants", restaurant_json: RestaurantJsonType) -> None:
         """
         Initialize the restaurant.
 

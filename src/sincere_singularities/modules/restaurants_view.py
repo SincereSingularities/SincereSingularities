@@ -1,4 +1,5 @@
 import random
+import re
 from typing import TYPE_CHECKING
 
 import disnake
@@ -6,7 +7,7 @@ import disnake
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.points import buy_restaurant, get_points, has_restaurant
 from sincere_singularities.modules.restaurant import Restaurant
-from sincere_singularities.utils import DISNAKE_COLORS
+from sincere_singularities.utils import DISNAKE_COLORS, RESTAURANT_JSON
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.conditions import ConditionManager
@@ -35,6 +36,7 @@ class RestaurantPurchaseView(disnake.ui.View):
     @disnake.ui.button(label="Buy", style=disnake.ButtonStyle.success)
     async def _buy(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         buy_restaurant(self.user_id, self.restaurant.name)
+        self.parent.update_state()
         await interaction.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
 
     @disnake.ui.button(label="Cancel", style=disnake.ButtonStyle.secondary)
@@ -45,42 +47,54 @@ class RestaurantPurchaseView(disnake.ui.View):
 class RestaurantsView(disnake.ui.View):
     """View subclass for choosing the restaurant."""
 
-    def __init__(self, restaurants: "Restaurants", embeds: list[disnake.Embed], index: int = 0) -> None:
+    def __init__(self, restaurants: "Restaurants", index: int = 0) -> None:
         """
         Initialize the restaurants view.
 
         Args:
             restaurants (Restaurants): The restaurants.
-            embeds (list[disnake.Embed]): The restaurant embeds.
             index (int, optional): The index to start from. Defaults to 0.
         """
         super().__init__(timeout=None)
         self.restaurants = restaurants
-        self.embeds = embeds
         self.index = index
 
         # Sets the footer of the embeds with their respective page numbers.
         for i, embed in enumerate(self.embeds):
             embed.set_footer(text=f"Restaurant {i + 1} of {len(self.embeds)}")
 
-        self._update_state()
+        self.update_state()
 
-    def _update_state(self) -> None:
+    @property
+    def embeds(self) -> list[disnake.Embed]:
+        """list[disnake.Embed]: The embeds of the restaurants (on the restaurant selection screen)."""
+        return self.restaurants.embeds
+
+    def update_state(self) -> None:
+        """Updating the State of the RestaurantsView"""
         # Disable previous/next button for first/last embeds
         self._prev_page.disabled = self.index == 0
         self._next_page.disabled = self.index == len(self.embeds) - 1
+        if has_restaurant(self.restaurants.interaction.user.id, self.restaurants.all_restaurants[self.index].name):
+            self._enter_restaurant.label = "Enter restaurant"
+        else:
+            self._enter_restaurant.label = "Buy"
+        points = get_points(self.restaurants.interaction.user.id)
+        description = self.embeds[self.index].description
+        assert description
+        self.embeds[self.index].description = re.sub(r"you have \d+", f"you have {points}", description)
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary, row=0)
     async def _prev_page(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         self.index -= 1
-        self._update_state()
+        self.update_state()
 
         await interaction.response.edit_message(embed=self.embeds[self.index], view=self)
 
     @disnake.ui.button(label="Enter Restaurant", style=disnake.ButtonStyle.success, row=0)
     async def _enter_restaurant(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         # Find restaurant based on current index
-        restaurant = self.restaurants.restaurants[self.index]
+        restaurant = self.restaurants.all_restaurants[self.index]
         # Show purchase view if the user doesn't own the restaurant
         if not has_restaurant(interaction.user.id, restaurant.name):
             user_points = get_points(interaction.user.id)
@@ -101,7 +115,7 @@ class RestaurantsView(disnake.ui.View):
     @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.secondary, row=0)
     async def _next_page(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         self.index += 1
-        self._update_state()
+        self.update_state()
 
         await interaction.response.edit_message(embed=self.embeds[self.index], view=self)
 
@@ -140,13 +154,11 @@ class Restaurants:
         self.interaction = interaction
         self.order_queue: OrderQueue = order_queue
         self.condition_manager = condition_manager
-        # Loading restaurants
-        self.restaurants_json = order_queue.restaurant_json
 
     @property
     def view(self) -> RestaurantsView:
         """RestaurantsView: The view object for the restaurants."""
-        return RestaurantsView(self, self.embeds)
+        return RestaurantsView(self)
 
     @property
     def embeds(self) -> list[disnake.Embed]:
@@ -154,11 +166,15 @@ class Restaurants:
         # Generate embeds from restaurants
         embeds: list[disnake.Embed] = []
 
-        for restaurant in self.restaurants_json:
+        for restaurant in RESTAURANT_JSON:
+            if has_restaurant(self.interaction.user.id, restaurant.name):
+                own = "You own this restaurant."
+            else:
+                own = ":lock: You don't own this restaurant."
             embed = disnake.Embed(
                 title=f"{restaurant.icon} {restaurant.name} {restaurant.icon}",
                 description=f"{restaurant.description} \n**Required points**: {restaurant.points}"
-                f" (you have {get_points(self.interaction.user.id)})",
+                f" (you have {get_points(self.interaction.user.id)})\n{own}",
                 colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
             # Adding an empty field for better formatting
@@ -191,10 +207,16 @@ class Restaurants:
 
     @property
     def restaurants(self) -> list[Restaurant]:
-        """list[Restaurant]: The restaurants list, each restaurant is initialized via its JSON."""
+        """list[Restaurant]: The restaurants that the user owns, each restaurant is initialized via its JSON."""
         # Creating Restaurant Objects Based on the Data
         return [
             Restaurant(self, restaurant)
-            for restaurant in self.restaurants_json
+            for restaurant in RESTAURANT_JSON
             if has_restaurant(self.interaction.user.id, restaurant.name)
         ]
+
+    @property
+    def all_restaurants(self) -> list[Restaurant]:
+        """list[Restaurant]: The restaurants list, each restaurant is initialized via its JSON."""
+        # Creating Restaurant Objects Based on the Data
+        return [Restaurant(self, restaurant) for restaurant in RESTAURANT_JSON]

@@ -1,10 +1,10 @@
 from collections import defaultdict
 from typing import TypedDict
 
-from sincere_singularities.utils import RestaurantJson, RestaurantJsonType, load_json
+from sincere_singularities.utils import RESTAURANT_JSON, RestaurantJsonType
 
 
-def get_restaurant_by_name(name: str) -> RestaurantJson:
+def get_restaurant_by_name(name: str) -> RestaurantJsonType:
     """
     Get a restaurant by its name.
 
@@ -17,7 +17,7 @@ def get_restaurant_by_name(name: str) -> RestaurantJson:
     Returns:
         RestaurantJson: The restaurant.
     """
-    for restaurant in load_json("restaurants.json", RestaurantJsonType):
+    for restaurant in RESTAURANT_JSON:
         if restaurant.name == name:
             return restaurant
     raise ValueError(f"Restaurant named {name!r} doesn't exist")
@@ -40,9 +40,7 @@ class TemporaryDatabaseEntry(TypedDict):
 
 
 temporary_database: defaultdict[int, TemporaryDatabaseEntry] = defaultdict(
-    lambda: TemporaryDatabaseEntry(
-        {"points": 0, "restaurants": [load_json("restaurants.json", RestaurantJsonType)[0].name]}
-    )
+    lambda: TemporaryDatabaseEntry({"points": 0, "restaurants": [RESTAURANT_JSON[0].name]})
 )
 
 

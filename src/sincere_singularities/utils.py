@@ -23,7 +23,7 @@ minilm_model = SentenceTransformer("all-MiniLM-L6-v2", device=device)
 
 
 @dataclass(unsafe_hash=True)
-class RestaurantJson:
+class RestaurantJsonType:
     """Represents a JSON-like object representing a restaurant."""
 
     name: str
@@ -34,8 +34,8 @@ class RestaurantJson:
     menu: dict[str, list[str]]
 
 
-RestaurantJsonType: TypeAlias = list[RestaurantJson]
-T = TypeVar("T", bound=RestaurantJsonType)
+RestaurantsType: TypeAlias = list[RestaurantJsonType]
+T = TypeVar("T", bound=RestaurantsType)
 
 
 def load_json(filename: str, json_type: type[T]) -> T:
@@ -66,6 +66,9 @@ def load_json(filename: str, json_type: type[T]) -> T:
         typed_json: T = dacite.from_dict(json_type, loaded_json)
 
         return typed_json
+
+
+RESTAURANT_JSON = load_json("restaurants.json", RestaurantsType)
 
 
 def check_pattern_similarity(first: str, second: str) -> float:
@@ -110,4 +113,4 @@ def generate_random_avatar_url() -> str:
     seed = random.random()
     flip = random.choice(("true", "false"))
     background_color = hex(random.randrange(0x000000, 0xFFFFFF))[2:].zfill(6)
-    return f"https://api.dicebear.com/9.x/notionists/svg?seed={seed}&flip={flip}&backgroundColor={background_color}"
+    return f"https://api.dicebear.com/9.x/notionists/png?seed={seed}&flip={flip}&backgroundColor={background_color}"

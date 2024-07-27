@@ -1,3 +1,4 @@
+import asyncio
 import random
 from collections import defaultdict
 from collections.abc import Iterable
@@ -13,6 +14,11 @@ from sincere_singularities.utils import DISNAKE_COLORS
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.restaurant import Restaurant
+
+# This global set is used to ensure that a (non-weak) reference is kept to background tasks created that aren't
+# awaited. These tasks get added to this set, then once they're done, they remove themselves.
+# See RUF006
+background_tasks: set[asyncio.Task[None]] = set()
 
 
 @dataclass(frozen=True, slots=True)
@@ -164,7 +170,7 @@ class MenuItemView(disnake.ui.View):
         for food in menu_item:
             self.add_item(MenuItemButton(self, self.order, self.menu_section, food))
 
-    @disnake.ui.button(label="Back", style=disnake.ButtonStyle.secondary, row=1)
+    @disnake.ui.button(label="Back", style=disnake.ButtonStyle.secondary, row=2)
     async def _food_back(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         await interaction.response.edit_message(view=self.order_view, embed=self.order_view.embed)
 
@@ -271,10 +277,14 @@ class OrderView(disnake.ui.View):
         if not correct_order:
             raise KeyError(f"order with ID {self.order.customer_information.order_id} doesn't exist")
 
-        # Calculating correctness and discarding order
+        # Calculating correctness
         correctness = self.restaurant.check_order(self.order, correct_order)
-        await self.restaurant.order_queue.discard_order(self.order.customer_information.order_id)
         points = round(correctness * 10)  # 100% -> 10p
+
+        # Discarding Order in Background
+        task = asyncio.create_task(self.restaurant.order_queue.discard_order(self.order.customer_information.order_id))
+        background_tasks.add(task)
+        task.add_done_callback(background_tasks.discard)
 
         # Checking how long order completion took
         time_taken = (datetime.now(tz=UTC) - correct_order.order_timestamp).total_seconds()

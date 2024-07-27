@@ -16,8 +16,9 @@ from disnake import (
 from disnake.ext.commands.errors import CommandInvokeError
 
 from sincere_singularities.modules.order import Order
+from sincere_singularities.modules.order_generator import OrderGenerator
 from sincere_singularities.modules.points import has_restaurant
-from sincere_singularities.utils import RestaurantJson, RestaurantJsonType, generate_random_avatar_url, load_json
+from sincere_singularities.utils import RESTAURANT_JSON, RestaurantsType, generate_random_avatar_url
 
 # Temporary
 ORDER_TEMPLATES = [
@@ -34,7 +35,7 @@ ORDER_TEMPLATES = [
 class OrderQueue:
     """The class for managing the order queue. Orders can be spawned and deleted from here."""
 
-    def __init__(self, interaction: ApplicationCommandInteraction, webhook: Webhook, orders_thread: Thread) -> None:
+    def __init__(self, interaction: ApplicationCommandInteraction, webhook: Webhook) -> None:
         """
         Initialize the order queue.
 
@@ -43,12 +44,13 @@ class OrderQueue:
             webhook (Webhook): The webhook.
             orders_thread (Thread): The orders Discord thread.
         """
+        self.interaction = interaction
         self.user = interaction.user
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
         self.running = False
-        self.restaurant_json = load_json("restaurants.json", RestaurantJsonType)
         self.webhook = webhook
-        self.orders_thread = orders_thread
+        self.easy_order_generator = OrderGenerator("easy")
+        self.orders_thread: Thread | None = None
 
     @classmethod
     async def new(cls, interaction: ApplicationCommandInteraction) -> Self | None:
@@ -70,23 +72,28 @@ class OrderQueue:
                 "Can't start GAME NAME: maximum amount of webhooks reached. Delete webhooks or try in another channel!"
             )
             return None
-        orders_thread = await interaction.channel.create_thread(
-            name="Orders Thread", type=ChannelType.public_thread, invitable=False
-        )
-        await orders_thread.add_user(interaction.user)
 
         return cls(
             interaction=interaction,
             webhook=webhook,
-            orders_thread=orders_thread,
         )
 
     async def start_orders(self) -> None:
         """Start the orders queue. Spawns three orders."""
         self.running = True
 
+        # Creating Orders Thread after initial Message was sent for proper message order.
+        self.orders_thread = await self.interaction.channel.create_thread(
+            name="Orders Thread", type=ChannelType.public_thread, invitable=False
+        )
+        assert self.orders_thread  # MYPY can be stupid at times...
+        await self.orders_thread.add_user(self.interaction.user)
+
         # Spawn 3 Orders at the start, which get refreshed after one order is done
-        for _ in range(3):
+        for i in range(3):
+            # Waiting after first order is sent for more realistic order messages
+            if i:
+                await asyncio.sleep(random.randint(5, 15))
             await self.spawn_order()
 
     async def spawn_order(self) -> None:
@@ -95,8 +102,8 @@ class OrderQueue:
             return
 
         # Filtering out the Restaurants the user has
-        restaurants: list[RestaurantJson] = [
-            restaurant for restaurant in self.restaurant_json if has_restaurant(self.user.id, restaurant.name)
+        restaurants: RestaurantsType = [
+            restaurant for restaurant in RESTAURANT_JSON if has_restaurant(self.user.id, restaurant.name)
         ]
 
         # Calculate the Order Amounts to relative values
@@ -106,11 +113,11 @@ class OrderQueue:
         ]
 
         # Getting a random restaurant weighed by their relative order amounts
-        random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0]
-        print(random_restaurant)
-        # TODO: Implement Clucker's algo
+        random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0].name
+        order, order_description = self.easy_order_generator.generate(random_restaurant)
+        await self.create_order(order, order_description)
 
-    async def create_order(self, order_message: str, order_result: Order) -> None:
+    async def create_order(self, order_result: Order, order_message: str) -> None:
         """
         Create a new order, sends a message, and stores the result to check.
 
@@ -121,13 +128,13 @@ class OrderQueue:
         if not order_result.customer_information:
             raise ValueError("missing customer_information")
 
-        discord_timestamp = f"<t:{order_result.penalty_timestamp.timestamp()}:R>"
+        dc_tz = f"<t:{int(order_result.penalty_timestamp.timestamp())}:R>"
         order_message += (
-            f" The order should be completed within {discord_timestamp} seconds or you will get a penalty!"
+            f"\n\n:warning: The order should be completed within {dc_tz} seconds or you will get a penalty! :warning:"
         )
         discord_message = await self.webhook.send(
             content=order_message,
-            username="GAME NAME",  # game would be too easy if the customer's name was here
+            username=f"GAME NAME - OrderID: {order_result.customer_information.order_id}",
             avatar_url=generate_random_avatar_url(),
             wait=True,
             thread=self.orders_thread,
@@ -167,6 +174,7 @@ class OrderQueue:
         with suppress(HTTPException, NotFound):
             # Deleting webhook
             await self.webhook.delete()
-        with suppress(HTTPException, NotFound):
+        with suppress(HTTPException, NotFound, AssertionError):
             # Deleting orders thread
+            assert self.orders_thread
             await self.orders_thread.delete()
