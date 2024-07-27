@@ -8,6 +8,7 @@ from db import ConnectError, DbClient
 
 class RestaurantFormat(TypedDict):
     """Restaurant format"""
+
     name: str
     icon: str
     description: str
@@ -18,6 +19,7 @@ class RestaurantFormat(TypedDict):
 
 class Restaurants:
     """restaurants"""
+
     def __init__(self) -> None:
         self.client = DbClient()
         self.collection = self.client.db.restaurants.name
@@ -36,7 +38,7 @@ class Restaurants:
         try:
             restaurant = self.client.show_one(self.collection, {"name": data["name"]})
             if restaurant:
-                self.update_restaurant(restaurant["name"], data)
+                self.update_restaurant(restaurant["name"], dict(data))
         except ValueError:
             self.client.add_element(self.collection, data)
 
@@ -104,7 +106,8 @@ class Restaurants:
         Returns:
             dict[str, Any]: Restaurant data
         """
-        return self.client.show_one(self.collection, {"name": name})
+        return dict(self.client.show_one(self.collection, {"name": name}))
+
 
 if __name__ == "__main__":
     db = DbClient()

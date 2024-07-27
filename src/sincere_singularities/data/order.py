@@ -15,6 +15,7 @@ class OrderFormat(TypedDict):
     delivery_time: str
     extra_information: str
 
+
 class Orders:
     """Orders"""
 
@@ -36,7 +37,7 @@ class Orders:
         try:
             order = self.client.show_one(self.collection, {"order_id": data["order_id"]})
             if order:
-                self.update_order(order["order_id"], data)
+                self.update_order(order["order_id"], dict(data))
         except ValueError:
             self.client.add_element(self.collection, data)
 
@@ -92,4 +93,4 @@ if __name__ == "__main__":
             "delivery_time": "ASAP",
             "extra_information": "N/A",
         },
-        )
+    )
