@@ -84,7 +84,8 @@ async def start_game(interaction: ApplicationCommandInteraction) -> None:
     # Check if the message was sent in a text channel
     if not isinstance(interaction.channel, TextChannel):
         await interaction.response.send_message(
-            "You can only start a game session inside of a text channel!", ephemeral=True
+            "You can only start a game session inside of a text channel!",
+            ephemeral=True,
         )
         return
 

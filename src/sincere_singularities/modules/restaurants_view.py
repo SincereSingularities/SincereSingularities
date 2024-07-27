@@ -5,7 +5,11 @@ from typing import TYPE_CHECKING
 import disnake
 
 from sincere_singularities.modules.order_queue import OrderQueue
-from sincere_singularities.modules.points import buy_restaurant, get_points, has_restaurant
+from sincere_singularities.modules.points import (
+    buy_restaurant,
+    get_points,
+    has_restaurant,
+)
 from sincere_singularities.modules.restaurant import Restaurant
 from sincere_singularities.utils import DISNAKE_COLORS, RESTAURANT_JSON
 

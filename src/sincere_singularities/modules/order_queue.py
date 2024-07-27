@@ -19,7 +19,11 @@ from disnake.ext.commands.errors import CommandInvokeError
 from sincere_singularities.modules.order import Order
 from sincere_singularities.modules.order_generator import Difficulty, OrderGenerator
 from sincere_singularities.modules.points import has_restaurant
-from sincere_singularities.utils import RESTAURANT_JSON, RestaurantsType, generate_random_avatar_url
+from sincere_singularities.utils import (
+    RESTAURANT_JSON,
+    RestaurantsType,
+    generate_random_avatar_url,
+)
 
 # vvv temporary until #6 gets merged vvv
 
