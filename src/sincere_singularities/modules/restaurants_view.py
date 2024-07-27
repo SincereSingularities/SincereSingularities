@@ -13,32 +13,49 @@ if TYPE_CHECKING:
 
 
 class RestaurantPurchaseView(disnake.ui.View):
-    """View subclass for buying a restaurant"""
+    """View subclass for buying a restaurant."""
 
     def __init__(self, user_id: int, restaurant: Restaurant, parent: "RestaurantsView") -> None:
+        """
+        Initialize a the restaurant purchase view.
+
+        Args:
+            user_id (int): The user's ID.
+            restaurant (Restaurant): The restaurant.
+            parent (RestaurantsView): The restaurants view.
+        """
         super().__init__(timeout=None)
         self.user_id = user_id
         self.restaurant = restaurant
         self.parent = parent
+        # Disable the buy button if the used doesn't have enough points.
         if get_points(user_id) < restaurant.points:
             self._buy.disabled = True
 
     @disnake.ui.button(label="Buy", style=disnake.ButtonStyle.success)
-    async def _buy(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def _buy(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         buy_restaurant(self.user_id, self.restaurant.name)
-        await inter.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
+        await interaction.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
 
     @disnake.ui.button(label="Cancel", style=disnake.ButtonStyle.secondary)
-    async def _cancel(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await inter.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
+    async def _cancel(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
+        await interaction.response.edit_message(view=self.parent, embed=self.parent.embeds[self.parent.index])
 
 
 class RestaurantsView(disnake.ui.View):
-    """View Subclass for Choosing the Restaurant"""
+    """View subclass for choosing the restaurant."""
 
-    def __init__(self, ctx: "Restaurants", embeds: list[disnake.Embed], index: int = 0) -> None:
+    def __init__(self, restaurants: "Restaurants", embeds: list[disnake.Embed], index: int = 0) -> None:
+        """
+        Initialize the restaurants view.
+
+        Args:
+            restaurants (Restaurants): The restaurants.
+            embeds (list[disnake.Embed]): The restaurant embeds.
+            index (int, optional): The index to start from. Defaults to 0.
+        """
         super().__init__(timeout=None)
-        self.ctx = ctx
+        self.restaurants = restaurants
         self.embeds = embeds
         self.index = index
 
@@ -49,24 +66,26 @@ class RestaurantsView(disnake.ui.View):
         self._update_state()
 
     def _update_state(self) -> None:
+        # Disable previous/next button for first/last embeds
         self._prev_page.disabled = self.index == 0
         self._next_page.disabled = self.index == len(self.embeds) - 1
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary, row=0)
-    async def _prev_page(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def _prev_page(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         self.index -= 1
         self._update_state()
 
-        await inter.response.edit_message(embed=self.embeds[self.index], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.index], view=self)
 
     @disnake.ui.button(label="Enter Restaurant", style=disnake.ButtonStyle.success, row=0)
-    async def _enter_restaurant(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        # Find Restaurant based on current index
-        restaurant = self.ctx.restaurants[self.index]
-        if not has_restaurant(inter.user.id, restaurant.name):
-            user_points = get_points(inter.user.id)
-            await inter.response.edit_message(
-                view=RestaurantPurchaseView(inter.user.id, restaurant, self),
+    async def _enter_restaurant(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
+        # Find restaurant based on current index
+        restaurant = self.restaurants.restaurants[self.index]
+        # Show purchase view if the user doesn't own the restaurant
+        if not has_restaurant(interaction.user.id, restaurant.name):
+            user_points = get_points(interaction.user.id)
+            await interaction.response.edit_message(
+                view=RestaurantPurchaseView(interaction.user.id, restaurant, self),
                 embed=disnake.Embed(
                     title="You do not own this restaurant.",
                     description=f"It costs {restaurant.points} points.\nYou have {user_points}.\nAfter buying it,"
@@ -75,75 +94,76 @@ class RestaurantsView(disnake.ui.View):
                 ),
             )
             return
-        # Stopping view
+        # Stopping this view
         self.stop()
-        await restaurant.enter_menu(inter)
+        await restaurant.enter_menu(interaction)
 
     @disnake.ui.button(emoji="▶", style=disnake.ButtonStyle.secondary, row=0)
-    async def _next_page(self, _: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def _next_page(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
         self.index += 1
         self._update_state()
 
-        await inter.response.edit_message(embed=self.embeds[self.index], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.index], view=self)
 
     @disnake.ui.button(label="Pause Orders", style=disnake.ButtonStyle.secondary, row=1)
-    async def _pause_orders(self, *_: disnake.ui.Button | disnake.MessageInteraction) -> None:
-        # Placebo Button. Doesnt do anything but looks nice (to give the user feeling of control.)
-        # This button doesnt do anything because the game ensure the user has 3 orders at all times, so you wont get
-        # more than 3 orders anyway, and they dont run out
-        return
+    async def _pause_orders(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
+        # Placebo Button. Doesn't do anything but looks nice (to give the user feeling of control.)
+        # This button doesn't do anything because the game ensure the user has 3 orders at all times, so you won't get
+        # more than 3 orders anyway, and they don't run out.
+        await interaction.response.defer()
 
     @disnake.ui.button(label="Stop the Game", style=disnake.ButtonStyle.danger, row=1)
     async def _stop_game(self, *_: disnake.ui.Button | disnake.MessageInteraction) -> None:
         # TODO: Savestates?
         # TODO: fix awful typing when implemented
-        await self.ctx.inter.delete_original_message()
-        await self.ctx.order_queue.stop_orders()
+        await self.restaurants.interaction.delete_original_message()
+        await self.restaurants.order_queue.stop_orders()
 
 
 class Restaurants:
-    """Class to Manage the Restaurants & UI"""
+    """Class to manage the restaurants and the UI."""
 
-    condition_manager: "ConditionManager"
+    def __init__(
+        self,
+        interaction: disnake.ApplicationCommandInteraction,
+        order_queue: OrderQueue,
+        condition_manager: "ConditionManager",
+    ) -> None:
+        """
+        Initialize the restaurants.
 
-    def __init__(self, inter: disnake.ApplicationCommandInteraction, order_queue: OrderQueue) -> None:
-        self.inter = inter
-        self.order_queue = order_queue
-        # Loading Restaurants
+        Args:
+            interaction (disnake.ApplicationCommandInteraction): The Disnake application command interaction.
+            order_queue (OrderQueue): The order queue.
+            condition_manager (ConditionManager): The condition manager.
+        """
+        self.interaction = interaction
+        self.order_queue: OrderQueue = order_queue
+        self.condition_manager = condition_manager
+        # Loading restaurants
         self.restaurants_json = order_queue.restaurant_json
 
     @property
     def view(self) -> RestaurantsView:
-        """
-        Getting the View Object for the Restaurant. Method to reload the View everytime.
-
-        Returns:
-            RestaurantsView: The View Object
-        """
+        """RestaurantsView: The view object for the restaurants."""
         return RestaurantsView(self, self.embeds)
 
     @property
     def embeds(self) -> list[disnake.Embed]:
-        """
-        Getting the Embeds of each Restaurant (On the Restaurant Selection Screen).
-
-        Returns:
-             List of Disnake Embeds
-
-        """
-        # Generate Embeds from Restaurants
-        embeds = []
+        """list[disnake.Embed]: The embeds of the restaurants (on the restaurant selection screen)."""
+        # Generate embeds from restaurants
+        embeds: list[disnake.Embed] = []
 
         for restaurant in self.restaurants_json:
             embed = disnake.Embed(
                 title=f"{restaurant.icon} {restaurant.name} {restaurant.icon}",
                 description=f"{restaurant.description} \n**Required points**: {restaurant.points}"
-                f" (you have {get_points(self.inter.user.id)})",
+                f" (you have {get_points(self.interaction.user.id)})",
                 colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
-            # Adding an Empty Field for better formatting
+            # Adding an empty field for better formatting
             embed.add_field(" ", " ")
-            # Adding Examples from the Menu
+            # Adding examples from the Menu
             embed.add_field(
                 name="Example Starter",
                 value=f"`{random.choice(restaurant.menu['Starters'])}`",
@@ -171,15 +191,10 @@ class Restaurants:
 
     @property
     def restaurants(self) -> list[Restaurant]:
-        """
-        Getting the Restaurants List, each Restaurant is initialized via its JSON.
-
-        Returns: List of Restaurant Classes
-
-        """
+        """list[Restaurant]: The restaurants list, each restaurant is initialized via its JSON."""
         # Creating Restaurant Objects Based on the Data
         return [
             Restaurant(self, restaurant)
             for restaurant in self.restaurants_json
-            if has_restaurant(self.inter.user.id, restaurant.name)
+            if has_restaurant(self.interaction.user.id, restaurant.name)
         ]

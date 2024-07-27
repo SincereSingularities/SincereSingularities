@@ -3,14 +3,14 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypeAlias, TypeVar, get_args, get_origin
+from typing import TypeAlias, TypeVar, cast, get_args, get_origin
 
 import dacite
 import disnake
 import torch
 from sentence_transformers import SentenceTransformer, util
 
-CURRENT_DIR = Path(__file__).parent.absolute()
+CURRENT_DIR = Path(__file__).parent.resolve()
 DISNAKE_COLORS = {
     ":pizza:": disnake.Color.from_rgb(229, 97, 38),
     ":sushi:": disnake.Color.from_rgb(255, 153, 153),
@@ -24,7 +24,7 @@ minilm_model = SentenceTransformer("all-MiniLM-L6-v2", device=device)
 
 @dataclass(unsafe_hash=True)
 class RestaurantJson:
-    """Represents a JSON-like object representing a Restaurant."""
+    """Represents a JSON-like object representing a restaurant."""
 
     name: str
     icon: str
@@ -40,30 +40,29 @@ T = TypeVar("T", bound=RestaurantJsonType)
 
 def load_json(filename: str, json_type: type[T]) -> T:
     """
-    Helper for Loading a Json File
+    Helper for loading a JSON file.
 
     Args:
-        filename: Filename, e.g. myfile.json
-        json_type: Json Type
+        filename (str): The file's name (e.g. myfile.json).
+        json_type (type[T]): The type to load the file into.
 
-    Returns: JsonType
-
+    Returns:
+        T: The data of the file.
     """
-    # Opening the FilePath which is found under ./data/...
+    # Opening the filepath which is found under ./data/...
     json_filepath = CURRENT_DIR / "data" / filename
     with json_filepath.open(mode="r", encoding="utf-8") as f:
         loaded_json = json.load(f)
 
         if isinstance(loaded_json, list) and get_origin(json_type) is list:
-            # This gets the Class Type of the first element of json_type
+            # This gets the class type of the first element of json_type
             # Note: We can assume the json_type list only has one element
-            obj_type = get_args(json_type)[0]
+            object_type = get_args(json_type)[0]
 
-            # Applying the Dataclass to every Object in the List.
-            typed_objs: T = [dacite.from_dict(obj_type, obj) for obj in loaded_json]  # type: ignore[assignment]
-            return typed_objs
+            # Applying the dataclass to every object in the list.
+            return cast(T, [dacite.from_dict(object_type, obj) for obj in loaded_json])
 
-        # Applying the Dataclass to the loaded_json
+        # Applying the dataclass to the loaded_json
         typed_json: T = dacite.from_dict(json_type, loaded_json)
 
         return typed_json
