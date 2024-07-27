@@ -40,7 +40,7 @@ class TemporaryDatabaseEntry(TypedDict):
 
 
 temporary_database: defaultdict[int, TemporaryDatabaseEntry] = defaultdict(
-    lambda: TemporaryDatabaseEntry({"points": 30, "restaurants": [RESTAURANT_JSON[0].name]})
+    lambda: TemporaryDatabaseEntry({"points": 0, "restaurants": [RESTAURANT_JSON[0].name]})
 )
 
 
