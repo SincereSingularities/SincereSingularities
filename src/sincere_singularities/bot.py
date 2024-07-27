@@ -16,7 +16,7 @@ bot = commands.InteractionBot(intents=intents)
 background_tasks: set[asyncio.Task[None]] = set()
 
 
-@bot.slash_command(name="clear_webhooks")
+@bot.slash_command(name="clear_webhooks", description="Clears the webhooks in a channel.")
 async def clear_webhooks(interaction: ApplicationCommandInteraction) -> None:
     """
     Clears the webhooks in a channel.
@@ -38,14 +38,14 @@ async def clear_webhooks(interaction: ApplicationCommandInteraction) -> None:
         await interaction.response.send_message("You don't have the permissions to manage webhooks!", ephemeral=True)
         return
 
+    await interaction.response.send_message("Webhooks cleared!", ephemeral=True)
+
     webhooks = await interaction.channel.webhooks()
     for webhook in webhooks:
         await webhook.delete()
 
-    await interaction.response.send_message("Webhooks cleared!", ephemeral=True)
 
-
-@bot.slash_command(name="clear_threads")
+@bot.slash_command(name="clear_threads", description="Clears the threads in a channel.")
 async def clear_threads(interaction: ApplicationCommandInteraction) -> None:
     """
     Clears the threads in a channel.
@@ -67,13 +67,13 @@ async def clear_threads(interaction: ApplicationCommandInteraction) -> None:
         await interaction.response.send_message("You don't have the permissions to manage threads!", ephemeral=True)
         return
 
+    await interaction.response.send_message("Threads cleared!", ephemeral=True)
+
     for thread in interaction.channel.threads:
         await thread.delete()
 
-    await interaction.response.send_message("Threads cleared!", ephemeral=True)
 
-
-@bot.slash_command(name="start_game")
+@bot.slash_command(name="start_game", description="Starts the game.")
 async def start_game(interaction: ApplicationCommandInteraction) -> None:
     """
     Start the game.
@@ -101,35 +101,14 @@ async def start_game(interaction: ApplicationCommandInteraction) -> None:
     await interaction.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)
 
     # Spawning orders
-    await order_queue.start_orders()
+    task = asyncio.create_task(order_queue.start_orders())
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)
 
     # Spawning conditions
     task = asyncio.create_task(condition_manager.spawn_conditions())
     background_tasks.add(task)
     task.add_done_callback(background_tasks.discard)
-
-    # Creating temporary example order
-    from sincere_singularities.modules.order import CustomerInformation, Order
-
-    customer_info = CustomerInformation(
-        order_id="Test123",
-        name="Customer Name",
-        address="Customer Address",
-        delivery_time="9 o'clock.",
-        extra_information="Dont ring the bell.",
-    )
-    example_order_text = str(
-        "OrderID: Test123 \n"
-        "Hello, my name is Customer Name. I would like to have 2 Pizza Starter0 and a "
-        "Main Course0 delivered to my house Customer Address at 9 o'clock. "
-        "Please dont ring the bell."
-    )
-    example_order = Order(customer_information=customer_info, restaurant_name="Pizzaria")
-    example_order.foods["Starters"].append("Garlic Knots")
-    example_order.foods["Starters"].append("Garlic Knots")
-    example_order.foods["Main Courses"].append("Veggie Pizza")
-
-    await order_queue.create_order(example_order_text, example_order)
 
 
 @bot.event

@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from sincere_singularities.modules.order import CustomerInformation, Order
 from sincere_singularities.modules.order_queue import OrderQueue
-from sincere_singularities.utils import RestaurantJsonType, load_json
+from sincere_singularities.utils import RESTAURANT_JSON, RestaurantName
 
 # This global set is used to ensure that a (non-weak) reference is kept to background tasks created that aren't
 # awaited. These tasks get added to this set, then once they're done, they remove themselves.
@@ -72,17 +72,15 @@ class ConditionManager:
             restaurants (Restaurants): The restaurants.
         """
         self.order_queue = order_queue
-        self.orders_thread = order_queue.orders_thread
         self.webhook = order_queue.webhook
         self.user_id = order_queue.user.id
-        self.restaurants_json = load_json("restaurants.json", RestaurantJsonType)
 
         self.order_conditions = Conditions()
 
     async def spawn_conditions(self) -> None:
         """Constantly spawn conditions on the restaurants while the game is running."""
         while self.order_queue.running:
-            spawn_sleep_seconds = random.randint(6, 12)
+            spawn_sleep_seconds = random.randint(60, 120)
             despawn_sleep_seconds = float(random.randint(60, 120))
             await asyncio.sleep(spawn_sleep_seconds)
 
@@ -92,7 +90,7 @@ class ConditionManager:
                 weights=list(CONDITIONS_PROBABILITIES.values()),
             )[0]
             # Choose a random restaurant
-            restaurant = random.choice(self.restaurants_json)
+            restaurant = random.choice(RESTAURANT_JSON)
 
             # Choose a menu section and item if needed.
             menu_section, menu_item = None, None
@@ -113,7 +111,7 @@ class ConditionManager:
     async def apply_condition(
         self,
         condition: ConditionType,
-        restaurant_name: str,
+        restaurant_name: RestaurantName,
         despawn_seconds: float,
         menu_section: str | None = None,
         menu_item: str | None = None,
@@ -123,7 +121,7 @@ class ConditionManager:
 
         Args:
             condition (ConditionType): The condition to apply to the restaurant.
-            restaurant_name (str): The name of the restaurant.
+            restaurant_name (RestaurantName): The name of the restaurant.
             despawn_seconds (float): The amount of time in seconds to delete the condition message after sending.
             menu_section (str | None, optional): The name of the menu section (OUT_OF_STOCK_SECTION). Defaults to None.
             menu_item (str | None, optional): The name of the menu item (OUT_OF_STOCK_ITEM). Defaults to None.
@@ -161,14 +159,15 @@ class ConditionManager:
             content=message,
             username="🚨 Conditions Alert 🚨",
             wait=True,
-            thread=self.orders_thread,
+            thread=self.order_queue.orders_thread,
             delete_after=despawn_seconds,
+            avatar_url="https://www.emojibase.com/resources/img/emojis/apple/1f6a8.png",
         )
 
     async def delete_condition(
         self,
         condition: ConditionType,
-        restaurant_name: str,
+        restaurant_name: RestaurantName,
         despawn_seconds: float,
         menu_section: str | None = None,
         menu_item: str | None = None,
@@ -178,7 +177,7 @@ class ConditionManager:
 
         Args:
             condition (ConditionType): The condition to delete from the restaurant.
-            restaurant_name (str): The name of the restaurant.
+            restaurant_name (RestaurantName): The name of the restaurant.
             despawn_seconds (float): The amount of time in seconds to wait before deleting the condition.
             menu_section (str | None, optional): The name of the menu section (OUT_OF_STOCK_SECTION). Defaults to None.
             menu_item (str | None, optional): The name of the menu item (OUT_OF_STOCK_ITEM). Defaults to None.

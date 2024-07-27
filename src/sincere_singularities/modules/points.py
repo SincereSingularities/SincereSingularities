@@ -1,10 +1,10 @@
 from collections import defaultdict
 from typing import TypedDict
 
-from sincere_singularities.utils import RestaurantJson, RestaurantJsonType, load_json
+from sincere_singularities.utils import RESTAURANT_JSON, RestaurantJsonType, RestaurantName
 
 
-def get_restaurant_by_name(name: str) -> RestaurantJson:
+def get_restaurant_by_name(name: str) -> RestaurantJsonType:
     """
     Get a restaurant by its name.
 
@@ -17,7 +17,7 @@ def get_restaurant_by_name(name: str) -> RestaurantJson:
     Returns:
         RestaurantJson: The restaurant.
     """
-    for restaurant in load_json("restaurants.json", RestaurantJsonType):
+    for restaurant in RESTAURANT_JSON:
         if restaurant.name == name:
             return restaurant
     raise ValueError(f"Restaurant named {name!r} doesn't exist")
@@ -40,9 +40,7 @@ class TemporaryDatabaseEntry(TypedDict):
 
 
 temporary_database: defaultdict[int, TemporaryDatabaseEntry] = defaultdict(
-    lambda: TemporaryDatabaseEntry(
-        {"points": 0, "restaurants": [load_json("restaurants.json", RestaurantJsonType)[0].name]}
-    )
+    lambda: TemporaryDatabaseEntry({"points": 30, "restaurants": [RESTAURANT_JSON[0].name]})
 )
 
 
@@ -83,13 +81,13 @@ def get_restaurants(user_id: int) -> list[str]:
     return temporary_database[user_id]["restaurants"]
 
 
-def has_restaurant(user_id: int, restaurant_name: str) -> bool:
+def has_restaurant(user_id: int, restaurant_name: RestaurantName) -> bool:
     """
     Returns whether the user owns a restaurant.
 
     Args:
         user_id (int): The user's ID
-        restaurant_name (str): The restaurant's name.
+        restaurant_name (RestaurantName): The restaurant's name.
 
     Returns:
         bool: Whether the user owns that restaurant.
@@ -111,7 +109,7 @@ def add_restaurant(user_id: int, restaurant: str) -> None:
 # ^^^ temporary ^^^
 
 
-def buy_restaurant(user_id: int, restaurant_name: str) -> None:
+def buy_restaurant(user_id: int, restaurant_name: RestaurantName) -> None:
     """
     Buy a restaurant.
 
@@ -119,7 +117,7 @@ def buy_restaurant(user_id: int, restaurant_name: str) -> None:
 
     Args:
         user_id (int): The user's ID.
-        restaurant_name (str): The restaurant's name.
+        restaurant_name (RestaurantName): The restaurant's name.
 
     Raises:
         ValueError: Raised when the user already owns the restaurant.
