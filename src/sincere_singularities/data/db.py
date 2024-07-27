@@ -1,8 +1,6 @@
-import json
 import os
 from collections.abc import Iterable
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -215,16 +213,3 @@ class DbClient:
             if not self.show_one(collection, data):
                 raise ValueError("Element not found")
             self.db[collection].update_one(data, {"$set": new_data})
-
-
-if __name__ == "__main__":
-    db = DbClient()
-    path = Path(__file__).parent / "restaurants.json"
-
-    with path.open() as f:
-        restaurants = json.load(f)
-
-    db.add_many("restaurants", restaurants)
-    print(db.show_all("restaurants"))
-
-    print(db.show_all("restaurants"))
