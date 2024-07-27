@@ -23,7 +23,7 @@ def get_restaurant_by_name(name: str) -> RestaurantJson:
     raise ValueError(f"Restaurant named {name!r} doesn't exist")
 
 
-# vvv temporary until #6 gets merges vvv
+# vvv temporary until #6 gets merged vvv
 
 
 class TemporaryDatabaseEntry(TypedDict):
