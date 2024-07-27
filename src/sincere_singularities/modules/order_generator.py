@@ -9,7 +9,7 @@ from sincere_singularities.data.extra_informations import EXTRA_INFORMATIONS_WIT
 from sincere_singularities.data.intros_outros import INTROS, OUTROS
 from sincere_singularities.data.noise import NOISE
 from sincere_singularities.modules.order import CustomerInformation, Order
-from sincere_singularities.utils import RESTAURANT_JSON, RestaurantName
+from sincere_singularities.utils import RESTAURANT_JSON
 
 ORDER_ID_CHARS = string.ascii_lowercase + string.digits
 INITIAL_DISH_PROBABILITY = {
@@ -113,12 +113,12 @@ class OrderGenerator:
         self.delivery_time_probability = CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Time"]
         self.extra_information_probability = CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Extra Information"]
 
-    def generate(self, restaurant_name: RestaurantName) -> tuple[Order, str]:
+    def generate(self, restaurant_name: str) -> tuple[Order, str]:
         """
         Generate a new Random Order and an Order Description.
 
         Args:
-            restaurant_name (RestaurantName): The name of the restaurant as it appears in `restaurants.json`.
+            restaurant_name (str): The name of the restaurant as it appears in `restaurants.json`.
 
         Returns:
             tuple[Order, str]: The generated Order Object and The Order Description in text form.
@@ -153,7 +153,7 @@ class OrderGenerator:
 
         return order, order_description
 
-    def _generate_menu(self, order: Order, restaurant_name: RestaurantName) -> Order:
+    def _generate_menu(self, order: Order, restaurant_name: str) -> Order:
         restaurant = next(_restaurant for _restaurant in RESTAURANT_JSON if _restaurant.name == restaurant_name)
         # Get Probability to Generate Multiple Dishes in one Order
         multiple_dish_probabilities = MULTIPLE_DISH_PROBABILITY[self.difficulty]
@@ -264,6 +264,7 @@ class OrderGenerator:
         order_description = order_description.replace("<RESTAURANT>", order.restaurant_name)
 
         # Formatting Customer Information
+        assert order.customer_information
         order_description = order_description.replace("<NAME>", order.customer_information.name)
         order_description = order_description.replace("<ADDRESS>", order.customer_information.address)
         if has_delivery_time:

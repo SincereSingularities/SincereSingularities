@@ -10,7 +10,7 @@ import disnake
 from disnake import ButtonStyle, MessageInteraction, ModalInteraction, TextInputStyle
 
 from sincere_singularities.modules.points import add_points, get_points
-from sincere_singularities.utils import DISNAKE_COLORS, RestaurantName
+from sincere_singularities.utils import DISNAKE_COLORS
 
 if TYPE_CHECKING:
     from sincere_singularities.modules.restaurant import Restaurant
@@ -37,7 +37,7 @@ class Order:
     """The dataclass containing order information."""
 
     customer_information: CustomerInformation | None = None
-    restaurant_name: RestaurantName | None = None
+    restaurant_name: str | None = None
     foods: defaultdict[str, list[str]] = field(default_factory=lambda: defaultdict(list[str]))
 
     def __post_init__(self) -> None:

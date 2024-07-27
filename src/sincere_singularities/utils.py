@@ -3,14 +3,13 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, TypeAlias, TypeVar, cast, get_args, get_origin
+from typing import TypeAlias, TypeVar, cast, get_args, get_origin
 
 import dacite
 import disnake
 import torch
 from sentence_transformers import SentenceTransformer, util
 
-RestaurantName: TypeAlias = Literal["Pizzaria", "Fast Food", "Meat", "Sushi", "Seafood", "Chinese"]
 CURRENT_DIR = Path(__file__).parent.resolve()
 DISNAKE_COLORS = {
     ":pizza:": disnake.Color.from_rgb(229, 97, 38),

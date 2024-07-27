@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import TypedDict
 
-from sincere_singularities.utils import RESTAURANT_JSON, RestaurantJsonType, RestaurantName
+from sincere_singularities.utils import RESTAURANT_JSON, RestaurantJsonType
 
 
 def get_restaurant_by_name(name: str) -> RestaurantJsonType:
@@ -81,13 +81,13 @@ def get_restaurants(user_id: int) -> list[str]:
     return temporary_database[user_id]["restaurants"]
 
 
-def has_restaurant(user_id: int, restaurant_name: RestaurantName) -> bool:
+def has_restaurant(user_id: int, restaurant_name: str) -> bool:
     """
     Returns whether the user owns a restaurant.
 
     Args:
         user_id (int): The user's ID
-        restaurant_name (RestaurantName): The restaurant's name.
+        restaurant_name (str): The restaurant's name.
 
     Returns:
         bool: Whether the user owns that restaurant.
@@ -109,7 +109,7 @@ def add_restaurant(user_id: int, restaurant: str) -> None:
 # ^^^ temporary ^^^
 
 
-def buy_restaurant(user_id: int, restaurant_name: RestaurantName) -> None:
+def buy_restaurant(user_id: int, restaurant_name: str) -> None:
     """
     Buy a restaurant.
 
@@ -117,7 +117,7 @@ def buy_restaurant(user_id: int, restaurant_name: RestaurantName) -> None:
 
     Args:
         user_id (int): The user's ID.
-        restaurant_name (RestaurantName): The restaurant's name.
+        restaurant_name (str): The restaurant's name.
 
     Raises:
         ValueError: Raised when the user already owns the restaurant.
