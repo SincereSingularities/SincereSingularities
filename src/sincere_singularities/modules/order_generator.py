@@ -11,12 +11,14 @@ from sincere_singularities.data.noise import NOISE
 from sincere_singularities.modules.order import CustomerInformation, Order
 from sincere_singularities.modules.points import get_restaurant_by_name
 
+
 class Difficulty(Enum):
     """The difficulty of the game."""
 
     EASY = auto()
     MEDIUM = auto()
     HARD = auto()
+
 
 ORDER_ID_CHARS = string.ascii_lowercase + string.digits
 INITIAL_DISH_PROBABILITY = {

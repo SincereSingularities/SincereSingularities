@@ -164,7 +164,7 @@ class OrderQueue:
             order_id (str): The ID of the order to discard.
         """
         del self.orders[order_id]
-        
+
         # Increase difficulty every 10 completed orders
         self.number_of_orders += 1
         if self.number_of_orders == 10:
