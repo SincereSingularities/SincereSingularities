@@ -1,4 +1,4 @@
-EXTRA_INFORMATIONS_WITH_ADDITIONS = {
+EXTRA_WISHES_WITH_ADDITIONS = {
     "Please don't ring the bell": "Oh, and tell the delivery guy to not ring the bell",
     "Make sure the food isn't cold": "It's crucial the food arrives hot, please.",
     "Add some spice to the main dishes": "Could you kick up the heat a bit?",

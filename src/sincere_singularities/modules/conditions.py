@@ -34,8 +34,8 @@ class ConditionType(StrEnum):
     NO_DELIVERY = auto()
     # The delivery time shouldn't be specified.
     NO_DELIVERY_TIME = auto()
-    # Extra information shouldn't be specified.
-    NO_EXTRA_INFORMATION = auto()
+    # Extra wish shouldn't be specified.
+    NO_EXTRA_WISH = auto()
 
 
 # The probabilities of each condition happening. The numbers should add up to 1.
@@ -45,7 +45,7 @@ CONDITIONS_PROBABILITIES = {
     ConditionType.NO_FIRSTNAME: 0.1,
     ConditionType.NO_DELIVERY: 0.1,
     ConditionType.NO_DELIVERY_TIME: 0.1,
-    ConditionType.NO_EXTRA_INFORMATION: 0.1,
+    ConditionType.NO_EXTRA_WISH: 0.1,
 }
 
 CONDITION_FREQUENCIES = {
@@ -69,7 +69,7 @@ class Conditions:
     no_firstname: defaultdict[str, bool] = field(default_factory=lambda: defaultdict(bool))
     no_delivery: defaultdict[str, bool] = field(default_factory=lambda: defaultdict(bool))
     no_delivery_time: defaultdict[str, bool] = field(default_factory=lambda: defaultdict(bool))
-    no_extra_information: defaultdict[str, bool] = field(default_factory=lambda: defaultdict(bool))
+    no_extra_wish: defaultdict[str, bool] = field(default_factory=lambda: defaultdict(bool))
 
 
 class ConditionManager:
@@ -176,9 +176,9 @@ class ConditionManager:
             case ConditionType.NO_DELIVERY_TIME:
                 self.order_conditions.no_delivery_time[restaurant_name] = True
                 message = f"For {restaurant_name} orders you shouldn't specify delivery time."
-            case ConditionType.NO_EXTRA_INFORMATION:
-                self.order_conditions.no_extra_information[restaurant_name] = True
-                message = f"For {restaurant_name} orders you shouldn't specify extra information."
+            case ConditionType.NO_EXTRA_WISH:
+                self.order_conditions.no_extra_wish[restaurant_name] = True
+                message = f"For {restaurant_name} orders you shouldn't specify extra wishes."
 
         return await self.webhook.send(
             content=message,
@@ -231,8 +231,8 @@ class ConditionManager:
                 self.order_conditions.no_delivery[restaurant_name] = False
             case ConditionType.NO_DELIVERY_TIME:
                 self.order_conditions.no_delivery_time[restaurant_name] = False
-            case ConditionType.NO_EXTRA_INFORMATION:
-                self.order_conditions.no_extra_information[restaurant_name] = False
+            case ConditionType.NO_EXTRA_WISH:
+                self.order_conditions.no_extra_wish[restaurant_name] = False
 
     def adjust_order_to_conditions(self, order: Order) -> Order:
         """
@@ -268,7 +268,7 @@ class ConditionManager:
         adjusted_name = order.customer_information.name
         adjusted_address = order.customer_information.address
         adjusted_delivery_time = order.customer_information.delivery_time
-        adjusted_extra_information = order.customer_information.extra_information
+        adjusted_extra_wish = order.customer_information.extra_wish
 
         # Firstname check
         if self.order_conditions.no_firstname.get(restaurant_name):
@@ -282,9 +282,9 @@ class ConditionManager:
         if self.order_conditions.no_delivery_time.get(restaurant_name):
             adjusted_delivery_time = ""
 
-        # No extra information check
-        if self.order_conditions.no_extra_information.get(restaurant_name):
-            adjusted_extra_information = ""
+        # No extra wish check
+        if self.order_conditions.no_extra_wish.get(restaurant_name):
+            adjusted_extra_wish = ""
 
         # Generating new CustomerInformation
         adjusted_customer_information = CustomerInformation(
@@ -292,7 +292,7 @@ class ConditionManager:
             name=adjusted_name,
             address=adjusted_address,
             delivery_time=adjusted_delivery_time,
-            extra_information=adjusted_extra_information,
+            extra_wish=adjusted_extra_wish,
         )
         order.customer_information = adjusted_customer_information
 

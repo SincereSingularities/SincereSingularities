@@ -5,7 +5,7 @@ from enum import Enum, auto
 
 from faker import Faker
 
-from sincere_singularities.data.extra_informations import EXTRA_INFORMATIONS_WITH_ADDITIONS
+from sincere_singularities.data.extra_wishes import EXTRA_WISHES_WITH_ADDITIONS
 from sincere_singularities.data.intros_outros import INTROS, OUTROS
 from sincere_singularities.data.noise import NOISE
 from sincere_singularities.modules.order import CustomerInformation, Order
@@ -64,15 +64,15 @@ MULTIPLE_DISH_PROBABILITY = {
 CUSTOMER_INFORMATION_PROBABILITY = {
     Difficulty.EASY: {
         "Time": 0.4,
-        "Extra Information": 0.3,
+        "Extra Wish": 0.3,
     },
     Difficulty.MEDIUM: {
         "Time": 0.6,
-        "Extra Information": 0.5,
+        "Extra Wish": 0.5,
     },
     Difficulty.HARD: {
         "Time": 0.9,
-        "Extra Information": 0.7,
+        "Extra Wish": 0.7,
     },
 }
 
@@ -125,9 +125,9 @@ class OrderGenerator:
         return CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Time"]
 
     @property
-    def extra_information_probability(self) -> float:
-        """float: The probability of extra information being specified."""
-        return CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Extra Information"]
+    def extra_wish_probability(self) -> float:
+        """float: The probability of an extra wish being specified."""
+        return CUSTOMER_INFORMATION_PROBABILITY[self.difficulty]["Extra Wish"]
 
     def generate(self, restaurant_name: str) -> tuple[Order, str]:
         """
@@ -144,10 +144,10 @@ class OrderGenerator:
             restaurant_name=restaurant_name,
         )
 
-        # Randomize if Extra Information should be added
+        # Randomize if Extra Wish should be added
         has_delivery_time = random.random() < self.delivery_time_probability
-        has_extra_information = random.random() < self.extra_information_probability
-        extra_information = random.choice(list(EXTRA_INFORMATIONS_WITH_ADDITIONS.keys()))
+        has_extra_wish = random.random() < self.extra_wish_probability
+        extra_wish = random.choice(list(EXTRA_WISHES_WITH_ADDITIONS.keys()))
 
         # Generating Customer Information
         order.customer_information = CustomerInformation(
@@ -159,13 +159,13 @@ class OrderGenerator:
             address=fake.street_address(),
             # Randomly Formatted Delivery Time if applicable
             delivery_time=_generate_delivery_time() if has_delivery_time else "",
-            # Random Extra Information if applicable
-            extra_information=extra_information if has_extra_information else "",
+            # Random Extra Wish if applicable
+            extra_wish=extra_wish if has_extra_wish else "",
         )
         # Generating Foods
         order = self._generate_menu(order, restaurant_name)
         # Generating Order Description
-        order_description = self._generate_order_description(order, has_delivery_time, has_extra_information)
+        order_description = self._generate_order_description(order, has_delivery_time, has_extra_wish)
 
         return order, order_description
 
@@ -230,7 +230,7 @@ class OrderGenerator:
             " and ".join(f"{order.foods[menu_section].count(item)} {item}" for item in menu_section_set),
         )
 
-    def _generate_order_description(self, order: Order, has_delivery_time: bool, has_extra_information: bool) -> str:
+    def _generate_order_description(self, order: Order, has_delivery_time: bool, has_extra_wish: bool) -> str:
         # We'll add the Order Description to this string
         assert order.customer_information
         order_description = f":id: **Customer ID:** `{order.customer_information.order_id}`\n\n"
@@ -299,9 +299,9 @@ class OrderGenerator:
         # Adding Drinks
         order_description = self._generate_menu_items_description(order, order_description, "Drinks", "<DRINKS>")
 
-        # Adding Extra Information (if applicable)
-        if has_extra_information:
-            extra_information = EXTRA_INFORMATIONS_WITH_ADDITIONS[order.customer_information.extra_information]
-            order_description += f"\n:information_source: Customer Added: `{extra_information}`"
+        # Adding Extra Wish (if applicable)
+        if has_extra_wish:
+            extra_wish = EXTRA_WISHES_WITH_ADDITIONS[order.customer_information.extra_wish]
+            order_description += f"\n:information_source: Customer Added: `{extra_wish}`"
 
         return order_description
