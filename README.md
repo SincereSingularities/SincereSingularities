@@ -16,7 +16,8 @@ the information overload!
 ## Running the bot
 
 1. Python 3.11 is [recommended](https://github.com/DisnakeDev/disnake/pull/1135#issuecomment-1847303628).
-2. Install the Game:
+2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). <!-- TODO: explain better once we have an idea on how the bot works (e.g. what permissions are required) -->
+3. clone the repository:
     ```shell
    git clone https://github.com/SincereSingularities/SincereSingularities/
    cd SincereSingularities
@@ -29,3 +30,4 @@ the information overload!
    ```shell
    python -m sincere_singularities
     ```
+2.  Test the bot in your discord server.

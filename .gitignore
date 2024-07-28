@@ -32,3 +32,7 @@ build/
 .vscode/
 # MacOS
 .DS_Store
+
+# json files for test cases
+orders.json
+states.json
