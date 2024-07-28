@@ -76,7 +76,6 @@ class OrderQueue:
         Args:
             interaction (ApplicationCommandInteraction): The application command interaction.
             webhook (Webhook): The webhook.
-            orders_thread (Thread): The orders Discord thread.
         """
         self.interaction = interaction
         self.user = interaction.user

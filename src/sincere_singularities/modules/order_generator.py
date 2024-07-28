@@ -114,7 +114,7 @@ def _generate_delivery_time() -> str:
 
 
 class OrderGenerator:
-    """The OrderGenerator Class to generate Randomized Order Information and Noisified Order Descriptions"""
+    """The OrderGenerator Class to generate Randomized Order Information and Noised Order Descriptions"""
 
     def __init__(self, difficulty: Difficulty) -> None:
         self.difficulty = difficulty
@@ -215,8 +215,8 @@ class OrderGenerator:
 
         return order_description
 
+    @staticmethod
     def _generate_menu_items_description(
-        self,
         order: Order,
         order_description: str,
         menu_section: str,

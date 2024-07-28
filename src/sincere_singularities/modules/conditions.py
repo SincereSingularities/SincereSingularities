@@ -29,7 +29,7 @@ class ConditionType(StrEnum):
     NO_DELIVERY = auto()
     # The delivery time shouldn't be specified.
     NO_DELIVERY_TIME = auto()
-    # Extra informations shouldn't be specified.
+    # Extra information shouldn't be specified.
     NO_EXTRA_INFORMATION = auto()
 
 
@@ -52,7 +52,7 @@ CONDITION_FREQUENCIES = {
 
 @dataclass(slots=True)
 class Conditions:
-    """The conditions storage. Every dictionary's keys are restaurant names."""
+    """The condition's storage. Every dictionary's keys are restaurant names."""
 
     # Out of stock menu section. Format: Dict[Restaurant_Name, List[Menu_Section]]
     out_of_stock_sections: defaultdict[str, list[str]] = field(default_factory=lambda: defaultdict(list[str]))
@@ -76,7 +76,6 @@ class ConditionManager:
 
         Args:
             order_queue (OrderQueue): The order queue.
-            restaurants (Restaurants): The restaurants.
         """
         self.order_queue = order_queue
         self.webhook = order_queue.webhook
@@ -88,7 +87,7 @@ class ConditionManager:
         """Constantly spawn conditions on the restaurants while the game is running."""
         while self.order_queue.running:
             spawn_sleep_seconds = random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generator.difficulty])
-            despawn_sleep_seconds = float(
+            delete_sleep_seconds = float(
                 random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generator.difficulty])
             )
             await asyncio.sleep(spawn_sleep_seconds)
@@ -112,7 +111,7 @@ class ConditionManager:
             await self.apply_condition(
                 condition,
                 restaurant.name,
-                despawn_sleep_seconds,
+                delete_sleep_seconds,
                 menu_section,
                 menu_item,
             )
@@ -121,7 +120,7 @@ class ConditionManager:
                 self.delete_condition(
                     condition,
                     restaurant.name,
-                    despawn_sleep_seconds,
+                    delete_sleep_seconds,
                     menu_section,
                     menu_item,
                 )
@@ -133,7 +132,7 @@ class ConditionManager:
         self,
         condition: ConditionType,
         restaurant_name: str,
-        despawn_seconds: float,
+        delete_seconds: float,
         menu_section: str | None = None,
         menu_item: str | None = None,
     ) -> None:
@@ -143,7 +142,7 @@ class ConditionManager:
         Args:
             condition (ConditionType): The condition to apply to the restaurant.
             restaurant_name (str): The name of the restaurant.
-            despawn_seconds (float): The amount of time in seconds to delete the condition message after sending.
+            delete_seconds (float): The amount of time in seconds to delete the condition message after sending.
             menu_section (str | None, optional): The name of the menu section (OUT_OF_STOCK_SECTION). Defaults to None.
             menu_item (str | None, optional): The name of the menu item (OUT_OF_STOCK_ITEM). Defaults to None.
         """
@@ -181,15 +180,16 @@ class ConditionManager:
             username="🚨 Conditions Alert 🚨",
             wait=True,
             thread=self.order_queue.orders_thread,
-            delete_after=despawn_seconds,
+            delete_after=delete_seconds,
             avatar_url="https://www.emojibase.com/resources/img/emojis/apple/1f6a8.png",
         )
+        await self.order_queue.orders_thread.delete_messages([message])
 
     async def delete_condition(
         self,
         condition: ConditionType,
         restaurant_name: str,
-        despawn_seconds: float,
+        delete_seconds: float,
         menu_section: str | None = None,
         menu_item: str | None = None,
     ) -> None:
@@ -199,11 +199,11 @@ class ConditionManager:
         Args:
             condition (ConditionType): The condition to delete from the restaurant.
             restaurant_name (str): The name of the restaurant.
-            despawn_seconds (float): The amount of time in seconds to wait before deleting the condition.
+            delete_seconds (float): The amount of time in seconds to wait before deleting the condition.
             menu_section (str | None, optional): The name of the menu section (OUT_OF_STOCK_SECTION). Defaults to None.
             menu_item (str | None, optional): The name of the menu item (OUT_OF_STOCK_ITEM). Defaults to None.
         """
-        await asyncio.sleep(despawn_seconds)
+        await asyncio.sleep(delete_seconds)
 
         match condition:
             case ConditionType.OUT_OF_STOCK_SECTION:

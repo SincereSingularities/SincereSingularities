@@ -132,7 +132,7 @@ class RestaurantsView(disnake.ui.View):
 
     @disnake.ui.button(label="Stop the Game", style=disnake.ButtonStyle.danger, row=1)
     async def _stop_game(self, *_: disnake.ui.Button | disnake.MessageInteraction) -> None:
-        # TODO: Savestates?
+        # TODO: Save-states?
         # TODO: fix awful typing when implemented
         await self.restaurants.interaction.delete_original_message()
         await self.restaurants.order_queue.stop_orders()
