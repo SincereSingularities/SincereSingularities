@@ -29,7 +29,7 @@ class CustomerInformation:
     name: str
     address: str
     delivery_time: str
-    extra_information: str
+    extra_wish: str
 
 
 @dataclass
@@ -91,12 +91,12 @@ class CustomerInformationModal(disnake.ui.Modal):
                 value=pre_customer_information.delivery_time if pre_customer_information else None,
             ),
             disnake.ui.TextInput(
-                label="Extra information",
+                label="Extra wishes",
                 custom_id="extra",
                 style=TextInputStyle.paragraph,
                 required=False,
                 max_length=1028,
-                value=pre_customer_information.extra_information if pre_customer_information else None,
+                value=pre_customer_information.extra_wish if pre_customer_information else None,
             ),
         ]
         super().__init__(title="Customer information", components=components)
@@ -130,7 +130,7 @@ class CustomerInformationModal(disnake.ui.Modal):
             name=interaction.text_values.get("name", ""),
             address=interaction.text_values.get("address", ""),
             delivery_time=interaction.text_values.get("time", ""),
-            extra_information=interaction.text_values.get("extra", ""),
+            extra_wish=interaction.text_values.get("extra", ""),
         )
         await interaction.response.edit_message(view=self.order_view, embed=self.order_view.embed)
 
@@ -390,10 +390,10 @@ class OrderView(disnake.ui.View):
                 "You shouldn't specify the delivery time.",
                 inline=False,
             )
-        if conditions.no_extra_information.get(self.restaurant.name):
+        if conditions.no_extra_wish.get(self.restaurant.name):
             embed.add_field(
-                "No extra information",
-                "You shouldn't specify extra information.",
+                "No extra wishes",
+                "You shouldn't specify extra wishes.",
                 inline=False,
             )
 

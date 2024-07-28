@@ -115,12 +115,12 @@ class Restaurant:
         )
         score -= score_percentile + (-score_percentile * delivery_time_check)
 
-        # Extra information
-        extra_info_check = compare_sentences(
-            correct_customer_information.extra_information,
-            customer_information.extra_information,
+        # Extra wish
+        extra_wish_check = compare_sentences(
+            correct_customer_information.extra_wish,
+            customer_information.extra_wish,
         )
-        score -= score_percentile + (-score_percentile * extra_info_check)
+        score -= score_percentile + (-score_percentile * extra_wish_check)
 
         # Now we can subtract score points for each wrong order
         # Getting every order item
