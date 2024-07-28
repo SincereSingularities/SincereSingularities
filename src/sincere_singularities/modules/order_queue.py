@@ -96,10 +96,11 @@ class OrderQueue:
         if not isinstance(interaction.channel, TextChannel):
             raise TypeError("interaction.channel should be TextChannel")
         try:
-            webhook = await interaction.channel.create_webhook(name="GAME NAME Order Webhook")
+            webhook = await interaction.channel.create_webhook(name="Restaurant Rush: Kitchen Chaos - Order Webhook")
         except CommandInvokeError:
             await interaction.channel.send(
-                "Can't start GAME NAME: maximum amount of webhooks reached. Delete webhooks or try in another channel!"
+                "Can't start Restaurant Rush: Kitchen Chaos: maximum amount of webhooks reached. "
+                "Delete webhooks or try in another channel!"
             )
             return None
 
@@ -164,7 +165,7 @@ class OrderQueue:
         )
         discord_message = await self.webhook.send(
             content=order_message,
-            username=f"GAME NAME - OrderID: {order_result.customer_information.order_id}",
+            username=f"Restaurant Rush: Kitchen Chaos - OrderID: {order_result.customer_information.order_id}",
             avatar_url=generate_random_avatar_url(),
             wait=True,
             thread=self.orders_thread,
