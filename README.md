@@ -18,16 +18,22 @@ the information overload!
 1. Python 3.11 is [recommended](https://github.com/DisnakeDev/disnake/pull/1135#issuecomment-1847303628).
 2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). <!-- TODO: explain better once we have an idea on how the bot works (e.g. what permissions are required) -->
 3. clone the repository:
-    ```shell
+   ```shell
    git clone https://github.com/SincereSingularities/SincereSingularities/
    cd SincereSingularities
    pip install -e .
-    ```
-3. Setup
-   a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). <!-- TODO: explain better once we have an idea on how the bot works (e.g. what permissions are required) -->
+   ```
 4. Set the `BOT_TOKEN` environment variable to your Token using the `.env` file.
 5. Run The Game:
    ```shell
    python -m sincere_singularities
-    ```
-2.  Test the bot in your discord server.
+   ```
+6. Play!
+
+## Gameplay
+
+1. Choose a text channel.
+2. Run the `/start_game` command. That will create a thread.
+3. The bot will send the menu. This contains multiple restaurants that you can buy. You already own the first one.
+4. You will get orders in the thread as messages. Choose and enter the appropriate restaurant, and select the menu items that the customer requested.
+5. Then enter the customer's information which consists of:

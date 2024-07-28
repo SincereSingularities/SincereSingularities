@@ -8,6 +8,7 @@ from sincere_singularities.modules.conditions import ConditionManager
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.restaurants_view import Restaurants
 
+# Load Disnake Related Objects
 intents = Intents.default()
 bot = commands.InteractionBot(intents=intents)
 # This global set is used to ensure that a (non-weak) reference is kept to background tasks created that aren't

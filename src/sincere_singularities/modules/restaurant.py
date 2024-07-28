@@ -52,7 +52,7 @@ class Restaurant:
         self.name = restaurant_json.name
         self.icon = restaurant_json.icon
         self.description = restaurant_json.description
-        self.points = restaurant_json.points
+        self.coins = restaurant_json.coins
         self.menu = restaurant_json.menu
 
         self.order_queue: OrderQueue = restaurants.order_queue
@@ -122,7 +122,7 @@ class Restaurant:
         )
         score -= score_percentile + (-score_percentile * extra_wish_check)
 
-        # Now we can subtract score points for each wrong order
+        # Now we can subtract score coins for each wrong order
         # Getting every order item
         correct_order_items = [item for menu_items in correct_order.foods.values() for item in menu_items]
         all_order_items = [item for menu_items in order.foods.values() for item in menu_items]

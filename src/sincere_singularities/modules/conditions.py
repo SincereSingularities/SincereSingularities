@@ -92,9 +92,16 @@ class ConditionManager:
     async def spawn_conditions(self) -> None:
         """Constantly spawn conditions on the restaurants while the game is running."""
         while self.order_queue.running:
-            spawn_sleep_seconds = random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generator.difficulty])
+            # TODO: Get Difficulty elsewhere
+            # Choose a random restaurant
+            assert self.restaurants
+            restaurant = random.choice(self.restaurants.restaurants)
+
+            spawn_sleep_seconds = random.randint(
+                *CONDITION_FREQUENCIES[self.order_queue.order_generators[restaurant.name].difficulty]
+            )
             delete_sleep_seconds = float(
-                random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generator.difficulty])
+                random.randint(*CONDITION_FREQUENCIES[self.order_queue.order_generators[restaurant.name].difficulty])
             )
             await asyncio.sleep(spawn_sleep_seconds)
 
@@ -103,9 +110,6 @@ class ConditionManager:
                 population=list(CONDITIONS_PROBABILITIES.keys()),
                 weights=list(CONDITIONS_PROBABILITIES.values()),
             )[0]
-            # Choose a random restaurant
-            assert self.restaurants
-            restaurant = random.choice(self.restaurants.restaurants)
 
             # Choose a menu section and item if needed.
             menu_section, menu_item = None, None

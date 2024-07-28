@@ -1,18 +1,38 @@
-import json
-import pathlib
+from collections import defaultdict
 from collections.abc import Iterable
 from typing import Any, TypedDict
 
-from db import ConnectError, DbClient
+from sincere_singularities.data.db import ConnectError, DbClient
+from sincere_singularities.utils import RESTAURANT_JSON
+
+
+class State(TypedDict):
+    """A user's game state."""
+
+    coins: int
+    restaurants: list[str]
+    number_of_orders: dict[str, int]
 
 
 class StateFormat(TypedDict):
     """Sate format"""
 
     player_id: str
-    game_id: str
-    name: str
-    state: dict[str, Any]
+    state: State
+
+
+def generate_default_state() -> State:
+    """
+    Generate a default state for each user when they start the game for the first time.
+
+    Returns:
+        State: The default starter state.
+    """
+    return State(
+        coins=0,
+        restaurants=[RESTAURANT_JSON[0].name],
+        number_of_orders=defaultdict(int),
+    )
 
 
 class SaveStates:
@@ -39,7 +59,7 @@ class SaveStates:
                 self.save_game_state(user["player_id"], data["state"])
 
         except ValueError:
-            self.client.add_element(self.collection, data)
+            self.client.add_element(self.collection, dict(data))
 
     def add_many_user_states(self, datas: Iterable[StateFormat]) -> None:
         """Add many states
@@ -53,25 +73,33 @@ class SaveStates:
         for data in datas:
             self.add_user_state(data)
 
-    def save_game_state(self, player_id: str, state: dict[str, Any]) -> None:
+    def save_game_state(self, player_id: int, state: State) -> None:
         """Save state
 
         Args:
-            player_id (str): User id
-            state (str): State
+            player_id (int): User id
+            state (State): State
 
         Returns:
             None
         """
         self.client.update_one(self.collection, {"player_id": player_id}, {"state": state}, upsert=True)
 
-    def load_game_state(self, player_id: str) -> dict[str, Any]:
-        """Get states
+    def load_game_state(self, player_id: int) -> State:
+        """Get state
+
+        Args:
+            player_id (int): User id
 
         Returns:
-            dict[str, Any]: List of states
+            State: The user's state.
         """
-        return dict(self.client.show_one(self.collection, {"player_id": player_id}))
+        state_dict = self.client.show_one(self.collection, {"player_id": player_id})["state"]
+        return State(
+            coins=state_dict["coins"],
+            restaurants=state_dict["restaurants"],
+            number_of_orders=state_dict["number_of_orders"],
+        )
 
     def load_all_user_states(self) -> Iterable[Any]:
         """Get states
@@ -91,23 +119,3 @@ class SaveStates:
             None
         """
         self.client.delete_one(self.collection, {player_id: player_id})
-
-
-if __name__ == "__main__":
-    save_states = SaveStates()
-    path = pathlib.Path(__file__).parent / "states.json"
-
-    with path.open("r") as file:
-        states = json.load(file)
-
-    save_states.add_many_user_states(states)
-    print(save_states.load_all_user_states())
-    data: StateFormat = {
-        "player_id": "user123",
-        "game_id": "user123",
-        "name": "user",
-        "state": {"level": 2, "score": 10},
-    }
-    save_states.add_user_state(data)
-    save_states.save_game_state("user123", {"score": 1.5, "level": 2})
-    save_states.save_game_state("player457", {"score": 1.5, "level": 2})

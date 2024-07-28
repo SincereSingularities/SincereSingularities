@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 
 import disnake
 
-from sincere_singularities.modules.order_queue import OrderQueue
-from sincere_singularities.modules.points import (
+from sincere_singularities.modules.coins import (
     buy_restaurant,
-    get_points,
+    get_coins,
     has_restaurant,
 )
+from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.restaurant import Restaurant
 from sincere_singularities.utils import DISNAKE_COLORS, RESTAURANT_JSON
 
@@ -33,8 +33,8 @@ class RestaurantPurchaseView(disnake.ui.View):
         self.user_id = user_id
         self.restaurant = restaurant
         self.parent = parent
-        # Disable the buy button if the used doesn't have enough points.
-        if get_points(user_id) < restaurant.points:
+        # Disable the buy button if the used doesn't have enough coins.
+        if get_coins(user_id) < restaurant.coins:
             self._buy.disabled = True
 
     @disnake.ui.button(label="Buy", style=disnake.ButtonStyle.success)
@@ -83,10 +83,10 @@ class RestaurantsView(disnake.ui.View):
             self._enter_restaurant.label = "Enter restaurant"
         else:
             self._enter_restaurant.label = "Buy"
-        points = get_points(self.restaurants.interaction.user.id)
+        coins = get_coins(self.restaurants.interaction.user.id)
         description = self.embeds[self.index].description
         assert description
-        self.embeds[self.index].description = re.sub(r"you have \d+", f"you have {points}", description)
+        self.embeds[self.index].description = re.sub(r"you have \d+", f"you have {coins}", description)
 
     @disnake.ui.button(emoji="◀", style=disnake.ButtonStyle.secondary, row=0)
     async def _prev_page(self, _: disnake.ui.Button, interaction: disnake.MessageInteraction) -> None:
@@ -101,13 +101,13 @@ class RestaurantsView(disnake.ui.View):
         restaurant = self.restaurants.all_restaurants[self.index]
         # Show purchase view if the user doesn't own the restaurant
         if not has_restaurant(interaction.user.id, restaurant.name):
-            user_points = get_points(interaction.user.id)
+            user_coins = get_coins(interaction.user.id)
             await interaction.response.edit_message(
                 view=RestaurantPurchaseView(interaction.user.id, restaurant, self),
                 embed=disnake.Embed(
                     title="You do not own this restaurant.",
-                    description=f"It costs {restaurant.points} points.\nYou have {user_points}.\nAfter buying it,"
-                    f" you'd have {user_points - restaurant.points}.",
+                    description=f"It costs {restaurant.coins} coins.\nYou have {user_coins}.\nAfter buying it,"
+                    f" you'd have {user_coins - restaurant.coins}.",
                     colour=disnake.Color.yellow(),
                 ),
             )
@@ -177,8 +177,8 @@ class Restaurants:
                 own = ":lock: You don't own this restaurant."
             embed = disnake.Embed(
                 title=f"{restaurant.icon} {restaurant.name} {restaurant.icon}",
-                description=f"{restaurant.description} \n**Required points**: {restaurant.points}"
-                f" (you have {get_points(self.interaction.user.id)})\n{own}",
+                description=f"{restaurant.description} \n**Required coins**: {restaurant.coins}"
+                f" (you have {get_coins(self.interaction.user.id)})\n{own}",
                 colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
             # Adding an empty field for better formatting

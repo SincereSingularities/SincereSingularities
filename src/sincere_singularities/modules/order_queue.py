@@ -16,54 +16,51 @@ from disnake import (
 )
 from disnake.ext.commands.errors import CommandInvokeError
 
+from sincere_singularities import save_states
+from sincere_singularities.data.savestates import generate_default_state
+from sincere_singularities.modules.coins import has_restaurant
 from sincere_singularities.modules.order import Order
 from sincere_singularities.modules.order_generator import Difficulty, OrderGenerator
-from sincere_singularities.modules.points import has_restaurant
 from sincere_singularities.utils import (
     RESTAURANT_JSON,
     RestaurantsType,
     generate_random_avatar_url,
 )
 
-# vvv temporary until #6 gets merged vvv
 
-temporary_database: defaultdict[int, int] = defaultdict(int)
-
-
-def get_number_of_orders(user_id: int) -> int:
+def get_number_of_orders(user_id: int, restaurant: str) -> int:
     """
     Get the number of orders by a user.
 
     Args:
         user_id (int): The user's ID.
+        restaurant (str): The restaurant's name.
 
     Returns:
         int: The number of orders completed.
     """
-    return temporary_database[user_id]
+    try:
+        return save_states.load_game_state(user_id)["number_of_orders"][restaurant]
+    except (ValueError, KeyError):
+        return 0
 
 
-def add_number_of_orders(user_id: int) -> None:
+def add_number_of_orders(user_id: int, restaurant: str) -> None:
     """
     Add to the number of orders.
 
     Args:
         user_id (int): The user's ID.
+        restaurant (str): The restaurant's name.
     """
-    temporary_database[user_id] += 1
+    try:
+        state = save_states.load_game_state(user_id)
+    except ValueError:
+        state = generate_default_state()
 
-
-def remove_number_of_orders(user_id: int) -> None:
-    """
-    Remove/reset the number of orders of a user.
-
-    Args:
-        user_id (int): The user's ID.
-    """
-    del temporary_database[user_id]
-
-
-# ^^^ temporary ^^^
+    state["number_of_orders"].setdefault(restaurant, 0)
+    state["number_of_orders"][restaurant] += 1
+    save_states.save_game_state(user_id, state)
 
 
 class OrderQueue:
@@ -82,7 +79,7 @@ class OrderQueue:
         self.orders: dict[str, tuple[Order, WebhookMessage]] = {}
         self.running = False
         self.webhook = webhook
-        self.order_generator = OrderGenerator(Difficulty.EASY)
+        self.order_generators: defaultdict[str, OrderGenerator] = defaultdict(lambda: OrderGenerator(Difficulty.EASY))
         self.orders_thread: Thread | None = None
 
     @classmethod
@@ -147,7 +144,7 @@ class OrderQueue:
 
         # Getting a random restaurant weighed by their relative order amounts
         random_restaurant = random.choices(population=restaurants, weights=relative_order_amounts)[0].name
-        order, order_description = self.order_generator.generate(random_restaurant)
+        order, order_description = self.order_generators[random_restaurant].generate(random_restaurant)
         await self.create_order(order, order_description)
 
     async def create_order(self, order_result: Order, order_message: str) -> None:
@@ -195,15 +192,18 @@ class OrderQueue:
         Args:
             order_id (str): The ID of the order to discard.
         """
-        del self.orders[order_id]
+        order = self.orders[order_id][0]
 
         # Increase difficulty every 10 completed orders
-        add_number_of_orders(self.user.id)
-        orders = get_number_of_orders(self.user.id)
+        assert order.restaurant_name
+        add_number_of_orders(self.user.id, order.restaurant_name)
+        orders = get_number_of_orders(self.user.id, order.restaurant_name)
         if orders == 10:
-            self.order_generator.difficulty = Difficulty.MEDIUM
+            self.order_generators[order.restaurant_name].difficulty = Difficulty.MEDIUM
         elif orders == 20:
-            self.order_generator.difficulty = Difficulty.HARD
+            self.order_generators[order.restaurant_name].difficulty = Difficulty.HARD
+
+        del self.orders[order_id]
 
         # Wait 10-20 Seconds as an order cooldown
         await asyncio.sleep(random.randint(10, 20))
