@@ -20,6 +20,7 @@ class SaveStates:
 
     def __init__(self) -> None:
         self.client = DbClient()
+        self.client.db.states.create_index("player_id", unique=True)
         self.collection = self.client.db.states.name
         if not self.client.is_connected():
             raise ConnectError("Not connected to the database")
@@ -63,6 +64,9 @@ class SaveStates:
         Returns:
             None
         """
+        if not self.client.show_one(self.collection, {"player_id": player_id}):
+            self.client.add_element(self.collection, {"player_id": player_id, "state": state})
+            return
         self.client.update_one(self.collection, {"player_id": player_id}, {"state": state}, upsert=True)
 
     def load_game_state(self, player_id: str) -> dict[str, Any]:
