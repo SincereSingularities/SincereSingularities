@@ -58,7 +58,9 @@ class CustomerInformationModal(disnake.ui.Modal):
             order_view (OrderView): The order view.
         """
         self.order_view = order_view
-        pre_customer_information = self.order_view.order.customer_information
+        self.pre_customer_information = (
+            self.order_view.wrong_customer_information or self.order_view.order.customer_information
+        )
 
         components = [
             disnake.ui.TextInput(
@@ -66,21 +68,21 @@ class CustomerInformationModal(disnake.ui.Modal):
                 custom_id="order_id",
                 style=TextInputStyle.short,
                 max_length=64,
-                value=pre_customer_information.order_id if pre_customer_information else None,
+                value=self.pre_customer_information.order_id if self.pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Name",
                 custom_id="name",
                 style=TextInputStyle.short,
                 max_length=64,
-                value=pre_customer_information.name if pre_customer_information else None,
+                value=self.pre_customer_information.name if self.pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Address",
                 custom_id="address",
                 style=TextInputStyle.short,
                 max_length=64,
-                value=pre_customer_information.address if pre_customer_information else None,
+                value=self.pre_customer_information.address if self.pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Time of delivery",
@@ -88,7 +90,7 @@ class CustomerInformationModal(disnake.ui.Modal):
                 style=TextInputStyle.short,
                 required=False,
                 max_length=64,
-                value=pre_customer_information.delivery_time if pre_customer_information else None,
+                value=self.pre_customer_information.delivery_time if self.pre_customer_information else None,
             ),
             disnake.ui.TextInput(
                 label="Extra wishes",
@@ -96,7 +98,7 @@ class CustomerInformationModal(disnake.ui.Modal):
                 style=TextInputStyle.paragraph,
                 required=False,
                 max_length=1028,
-                value=pre_customer_information.extra_wish if pre_customer_information else None,
+                value=self.pre_customer_information.extra_wish if self.pre_customer_information else None,
             ),
         ]
         super().__init__(title="Customer information", components=components)
@@ -112,6 +114,15 @@ class CustomerInformationModal(disnake.ui.Modal):
         """
         # Check if wrong OrderID was entered
         if not self.order_view.restaurant.order_queue.get_order_by_id(interaction.text_values["order_id"]):
+            # Storing (wrong) CustomerInformation in Class to fill-in
+            self.order_view.wrong_customer_information = CustomerInformation(
+                order_id=interaction.text_values.get("order_id", ""),
+                name=interaction.text_values.get("name", ""),
+                address=interaction.text_values.get("address", ""),
+                delivery_time=interaction.text_values.get("time", ""),
+                extra_wish=interaction.text_values.get("extra", ""),
+            )
+
             # Adding error message
             embed = self.order_view.embed
             embed.insert_field_at(index=0, name=" ", value=" ", inline=False)
@@ -272,6 +283,7 @@ class OrderView(disnake.ui.View):
         super().__init__()
         self.restaurant = restaurant
         self.order = Order()
+        self.wrong_customer_information: CustomerInformation | None = None
         for i, menu_item in enumerate(restaurant.menu):
             self.add_item(MenuSectionButton(restaurant, self, self.order, menu_item, i))
 
