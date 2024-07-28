@@ -36,3 +36,6 @@ build/
 # json files for test cases
 orders.json
 states.json
+
+# MyPy
+.mypy_cache/

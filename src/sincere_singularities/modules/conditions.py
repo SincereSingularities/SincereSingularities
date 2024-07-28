@@ -4,11 +4,16 @@ from collections import defaultdict
 from contextlib import suppress
 from dataclasses import dataclass, field
 from enum import StrEnum, auto
+from typing import TYPE_CHECKING
+
+from disnake import WebhookMessage
 
 from sincere_singularities.modules.order import CustomerInformation, Order
 from sincere_singularities.modules.order_generator import Difficulty
 from sincere_singularities.modules.order_queue import OrderQueue
-from sincere_singularities.utils import RESTAURANT_JSON
+
+if TYPE_CHECKING:
+    from sincere_singularities.modules.restaurants_view import Restaurants
 
 # This global set is used to ensure that a (non-weak) reference is kept to background tasks created that aren't
 # awaited. These tasks get added to this set, then once they're done, they remove themselves.
@@ -81,6 +86,7 @@ class ConditionManager:
         self.webhook = order_queue.webhook
         self.user_id = order_queue.user.id
 
+        self.restaurants: Restaurants | None = None
         self.order_conditions = Conditions()
 
     async def spawn_conditions(self) -> None:
@@ -98,7 +104,8 @@ class ConditionManager:
                 weights=list(CONDITIONS_PROBABILITIES.values()),
             )[0]
             # Choose a random restaurant
-            restaurant = random.choice(RESTAURANT_JSON)
+            assert self.restaurants
+            restaurant = random.choice(self.restaurants.restaurants)
 
             # Choose a menu section and item if needed.
             menu_section, menu_item = None, None
@@ -108,10 +115,9 @@ class ConditionManager:
                     menu_item = random.choice(restaurant.menu[menu_section])
 
             # Apply the condition.
-            await self.apply_condition(
+            message = await self.apply_condition(
                 condition,
                 restaurant.name,
-                delete_sleep_seconds,
                 menu_section,
                 menu_item,
             )
@@ -119,6 +125,7 @@ class ConditionManager:
             task = asyncio.create_task(
                 self.delete_condition(
                     condition,
+                    message,
                     restaurant.name,
                     delete_sleep_seconds,
                     menu_section,
@@ -132,17 +139,15 @@ class ConditionManager:
         self,
         condition: ConditionType,
         restaurant_name: str,
-        delete_seconds: float,
         menu_section: str | None = None,
         menu_item: str | None = None,
-    ) -> None:
+    ) -> WebhookMessage:
         """
         Applies a condition to a restaurant.
 
         Args:
             condition (ConditionType): The condition to apply to the restaurant.
             restaurant_name (str): The name of the restaurant.
-            delete_seconds (float): The amount of time in seconds to delete the condition message after sending.
             menu_section (str | None, optional): The name of the menu section (OUT_OF_STOCK_SECTION). Defaults to None.
             menu_item (str | None, optional): The name of the menu item (OUT_OF_STOCK_ITEM). Defaults to None.
         """
@@ -175,18 +180,18 @@ class ConditionManager:
                 self.order_conditions.no_extra_information[restaurant_name] = True
                 message = f"For {restaurant_name} orders you shouldn't specify extra information."
 
-        await self.webhook.send(
+        return await self.webhook.send(
             content=message,
             username="🚨 Conditions Alert 🚨",
             wait=True,
             thread=self.order_queue.orders_thread,
-            delete_after=delete_seconds,
             avatar_url="https://www.emojibase.com/resources/img/emojis/apple/1f6a8.png",
         )
 
     async def delete_condition(
         self,
         condition: ConditionType,
+        message: WebhookMessage,
         restaurant_name: str,
         delete_seconds: float,
         menu_section: str | None = None,
@@ -197,12 +202,17 @@ class ConditionManager:
 
         Args:
             condition (ConditionType): The condition to delete from the restaurant.
+            message (WebhookMessage): The message to delete.
             restaurant_name (str): The name of the restaurant.
             delete_seconds (float): The amount of time in seconds to wait before deleting the condition.
             menu_section (str | None, optional): The name of the menu section (OUT_OF_STOCK_SECTION). Defaults to None.
             menu_item (str | None, optional): The name of the menu item (OUT_OF_STOCK_ITEM). Defaults to None.
         """
         await asyncio.sleep(delete_seconds)
+
+        # Deleting Webhook message (Note: delete_after or message.delete() dont work presumably because of the thread)
+        assert self.order_queue.orders_thread
+        await self.order_queue.orders_thread.delete_messages([message])
 
         match condition:
             case ConditionType.OUT_OF_STOCK_SECTION:
