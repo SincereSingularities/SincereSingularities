@@ -78,7 +78,7 @@ class SaveStates:
 
         Args:
             player_id (int): User id
-            state (str): State
+            state (State): State
 
         Returns:
             None
