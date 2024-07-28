@@ -183,7 +183,6 @@ class ConditionManager:
             delete_after=delete_seconds,
             avatar_url="https://www.emojibase.com/resources/img/emojis/apple/1f6a8.png",
         )
-        await self.order_queue.orders_thread.delete_messages([message])
 
     async def delete_condition(
         self,
