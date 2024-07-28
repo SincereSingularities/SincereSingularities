@@ -92,7 +92,6 @@ class ConditionManager:
     async def spawn_conditions(self) -> None:
         """Constantly spawn conditions on the restaurants while the game is running."""
         while self.order_queue.running:
-            # TODO: Get Difficulty elsewhere
             # Choose a random restaurant
             assert self.restaurants
             restaurant = random.choice(self.restaurants.restaurants)
