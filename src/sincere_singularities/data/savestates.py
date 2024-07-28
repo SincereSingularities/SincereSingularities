@@ -10,8 +10,6 @@ class StateFormat(TypedDict):
     """Sate format"""
 
     player_id: str
-    game_id: str
-    name: str
     state: dict[str, Any]
 
 
@@ -20,6 +18,7 @@ class SaveStates:
 
     def __init__(self) -> None:
         self.client = DbClient()
+        self.client.db.states.create_index("player_id", unique=True)
         self.collection = self.client.db.states.name
         if not self.client.is_connected():
             raise ConnectError("Not connected to the database")
@@ -63,7 +62,10 @@ class SaveStates:
         Returns:
             None
         """
-        self.client.update_one(self.collection, {"player_id": player_id}, {"state": state}, upsert=True)
+        if not self.client.show_one(self.collection, {"player_id": player_id}):
+            self.add_user_state({"player_id": player_id, "state": state})
+            return
+        self.client.update_one(self.collection, {"player_id": player_id}, {"$set": {"state": state}})
 
     def load_game_state(self, player_id: str) -> dict[str, Any]:
         """Get states
@@ -104,8 +106,6 @@ if __name__ == "__main__":
     print(save_states.load_all_user_states())
     data: StateFormat = {
         "player_id": "user123",
-        "game_id": "user123",
-        "name": "user",
         "state": {"level": 2, "score": 10},
     }
     save_states.add_user_state(data)

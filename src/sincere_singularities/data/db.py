@@ -63,13 +63,10 @@ class DbClient:
         if not self.connected:
             raise ConnectError("Not connected to the database")
 
-        name = data["name"]
-        # Check if the restaurant already exists
-        if not self.db[collection].find_one({"name": name}):
-            current_time = datetime.now(utc_timezone)
-            data["created_at"] = current_time
-            data["updated_at"] = current_time
-            self.db[collection].insert_one(data)
+        current_time = datetime.now(utc_timezone)
+        data["created_at"] = current_time
+        data["updated_at"] = current_time
+        self.db[collection].insert_one(data)
 
     def add_many(self, collection: str, datas: Iterable[Any]) -> None:
         """Add many elements
