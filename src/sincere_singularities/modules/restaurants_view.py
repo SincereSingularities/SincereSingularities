@@ -181,6 +181,8 @@ class Restaurants:
                 f" (you have {get_coins(self.interaction.user.id)})\n{own}",
                 colour=DISNAKE_COLORS.get(restaurant.icon, disnake.Color.random()),
             )
+            # Setting Embed Author
+            embed.set_author(name="Restaurant Rush: Kitchen Chaos")
             # Adding an empty field for better formatting
             embed.add_field(" ", " ")
             # Adding examples from the Menu

@@ -1,4 +1,4 @@
-# Game Title Here
+# Restaurant Rush: Kitchen Chaos
 
 **Sincere Singularities** Python Discord Summer CodeJam 2024 project.
 The technology is **Discord Application**, the theme is **Information Overload**, and our chosen framework
