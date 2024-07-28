@@ -1,9 +1,11 @@
 import asyncio
 from typing import cast
 
-from disnake import ApplicationCommandInteraction, Intents, Member, TextChannel
+import disnake
+from disnake import ApplicationCommandInteraction, Embed, Intents, Member, MessageInteraction, TextChannel
 from disnake.ext import commands
 
+from sincere_singularities import save_states
 from sincere_singularities.modules.conditions import ConditionManager
 from sincere_singularities.modules.order_queue import OrderQueue
 from sincere_singularities.modules.restaurants_view import Restaurants
@@ -74,6 +76,14 @@ async def clear_threads(interaction: ApplicationCommandInteraction) -> None:
         await thread.delete()
 
 
+class IntroductionView(disnake.ui.View):
+    """View for the introduction to the game."""
+
+    @disnake.ui.button(style=disnake.ButtonStyle.success, label="Start!")
+    async def _start(self, _: disnake.ui.Button, interaction: MessageInteraction) -> None:
+        await start_the_game(interaction)
+
+
 @bot.slash_command(name="start_game", description="Starts the game.")
 async def start_game(interaction: ApplicationCommandInteraction) -> None:
     """
@@ -90,6 +100,52 @@ async def start_game(interaction: ApplicationCommandInteraction) -> None:
         )
         return
 
+    try:
+        save_states.load_game_state(interaction.user.id)
+    except ValueError:
+        embed = Embed(
+            title="Introduction",
+            description="Welcome to Restaurant Rush: Kitchen Chaos! In this game, you manage orders from customers for"
+            " multiple restaurants, but make sure you don't get overwhelmed by the information overload.",
+        )
+        embed.add_field(
+            name="Starting the game",
+            description="Once you start the game, the orders will be sent as messages in a thread which will be"
+            " created in this channel. The bot will also send the game menu where you can enter restaurants and"
+            " add orders. You can buy restaurants with coins, but you already own the first one.",
+            inline=False,
+        )
+        embed.add_field(
+            name="Adding an order",
+            description="When you get a new order, select the appropriate restaurant from the menu and enter it."
+            " Press the buttons to add the menu items that the user requested. Then, input the customer"
+            " information and click done. You will receive coins based on how correct you were.",
+            inline=False,
+        )
+        embed.add_field(
+            name="The information overload",
+            description="The more you play the game, the more difficult it gets. Be quick because being slow will"
+            " result in penalties!",
+            inline=False,
+        )
+        embed.add_field(
+            name="Buying restaurants",
+            description="Once you gain enough coins, you can buy other restaurants.",
+            inline=False,
+        )
+        interaction.response.send_message(embed=embed, view=IntroductionView())
+    else:
+        await start_the_game(interaction)
+
+
+async def start_the_game(interaction: ApplicationCommandInteraction | MessageInteraction) -> None:
+    """
+    Actually start the game.
+
+    Args:
+        interaction (ApplicationCommandInteraction | MessageInteraction): The interaction that led to the start of
+            the game.
+    """
     # Start order queue
     order_queue = await OrderQueue.new(interaction)
     if not order_queue:
