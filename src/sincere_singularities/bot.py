@@ -97,6 +97,7 @@ async def start_game(interaction: ApplicationCommandInteraction) -> None:
     # Load Restaurants
     condition_manager = ConditionManager(order_queue)
     restaurants = Restaurants(interaction, order_queue, condition_manager)
+    condition_manager.restaurants = restaurants
 
     # Sending start menu
     await interaction.response.send_message(embed=restaurants.embeds[0], view=restaurants.view, ephemeral=True)
