@@ -393,7 +393,7 @@ class OrderView(disnake.ui.View):
         if conditions.no_extra_information.get(self.restaurant.name):
             embed.add_field(
                 "No extra information",
-                "You shouldn't specify extra informations.",
+                "You shouldn't specify extra information.",
                 inline=False,
             )
 
