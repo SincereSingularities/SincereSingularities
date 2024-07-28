@@ -13,7 +13,11 @@ from sentence_transformers import SentenceTransformer, util
 CURRENT_DIR = Path(__file__).parent.resolve()
 DISNAKE_COLORS = {
     ":pizza:": disnake.Color.from_rgb(229, 97, 38),
+    ":hamburger:": disnake.Color.from_rgb(255, 223, 0),
+    ":cut_off_meat:": disnake.Color.from_rgb(153, 73, 66),
     ":sushi:": disnake.Color.from_rgb(255, 153, 153),
+    ":shrimp:": disnake.Color.from_rgb(222, 102, 62),
+    ":fortune_cookie:": disnake.Color.from_rgb(227, 189, 1133),
 }
 
 # Use GPU if available
