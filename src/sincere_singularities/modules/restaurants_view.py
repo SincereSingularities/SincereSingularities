@@ -102,12 +102,24 @@ class RestaurantsView(disnake.ui.View):
         # Show purchase view if the user doesn't own the restaurant
         if not has_restaurant(interaction.user.id, restaurant.name):
             user_coins = get_coins(interaction.user.id)
+            if user_coins < restaurant.coins:
+                embed_title = "You do not have enough coins to buy this restaurant."
+                embed_description = (
+                    f"It costs {restaurant.coins} coins.\nYou have {user_coins}.\nTo buy it,"
+                    f" you need {restaurant.coins - user_coins} more coins."
+                )
+            else:
+                embed_title = "You do not own this restaurant."
+                embed_description = (
+                    f"It costs {restaurant.coins} coins.\nYou have {user_coins}.\nAfter buying it,"
+                    f" you'd have {user_coins - restaurant.coins}."
+                )
+
             await interaction.response.edit_message(
                 view=RestaurantPurchaseView(interaction.user.id, restaurant, self),
                 embed=disnake.Embed(
-                    title="You do not own this restaurant.",
-                    description=f"It costs {restaurant.coins} coins.\nYou have {user_coins}.\nAfter buying it,"
-                    f" you'd have {user_coins - restaurant.coins}.",
+                    title=embed_title,
+                    description=embed_description,
                     colour=disnake.Color.yellow(),
                 ),
             )
