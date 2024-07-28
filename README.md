@@ -36,4 +36,4 @@ the information overload!
 2. Run the `/start_game` command. That will create a thread.
 3. The bot will send the menu. This contains multiple restaurants that you can buy. You already own the first one.
 4. You will get orders in the thread as messages. Choose and enter the appropriate restaurant, and select the menu items that the customer requested.
-5. Then enter the customer's information. 
+5. Then enter the customer's information which consists of:
