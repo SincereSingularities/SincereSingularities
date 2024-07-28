@@ -1,6 +1,5 @@
-from collections import defaultdict
-from typing import TypedDict
-
+from sincere_singularities import save_states
+from sincere_singularities.data.savestates import generate_default_state
 from sincere_singularities.utils import RESTAURANT_JSON, RestaurantJsonType
 
 
@@ -23,49 +22,37 @@ def get_restaurant_by_name(name: str) -> RestaurantJsonType:
     raise ValueError(f"Restaurant named {name!r} doesn't exist")
 
 
-# vvv temporary until #6 gets merged vvv
-
-
-class TemporaryDatabaseEntry(TypedDict):
+def get_coins(user_id: int) -> int:
     """
-    An entry to the temporary database.
-
-    Args:
-        points (int): How many points the user has.
-        restaurants (list[str]): The names of the restaurants that the user owns.
-    """
-
-    points: int
-    restaurants: list[str]
-
-
-temporary_database: defaultdict[int, TemporaryDatabaseEntry] = defaultdict(
-    lambda: TemporaryDatabaseEntry({"points": 0, "restaurants": [RESTAURANT_JSON[0].name]})
-)
-
-
-def get_points(user_id: int) -> int:
-    """
-    Get the points that the user has.
+    Get the coins that the user has.
 
     Args:
         user_id (int): The user's ID.
 
     Returns:
-        int: The amount of points that the user has.
+        int: The amount of coins that the user has.
     """
-    return temporary_database[user_id]["points"]
+    try:
+        return save_states.load_game_state(user_id)["coins"]
+    except (ValueError, KeyError):
+        return 0
 
 
-def add_points(user_id: int, points: int) -> None:
+def add_coins(user_id: int, coins: int) -> None:
     """
-    Add points to the user.
+    Add coins to the user.
 
     Args:
         user_id (int): The user's ID.
-        points (int): The amount of points to add.
+        coins (int): The amount of coins to add.
     """
-    temporary_database[user_id]["points"] += points
+    try:
+        state = save_states.load_game_state(user_id)
+    except ValueError:
+        state = generate_default_state()
+
+    state["coins"] += coins
+    save_states.save_game_state(user_id, state)
 
 
 def get_restaurants(user_id: int) -> list[str]:
@@ -78,7 +65,10 @@ def get_restaurants(user_id: int) -> list[str]:
     Returns:
         list[str]: The names of the restaurants that the user owns.
     """
-    return temporary_database[user_id]["restaurants"]
+    try:
+        return save_states.load_game_state(user_id)["restaurants"]
+    except (ValueError, KeyError):
+        return [RESTAURANT_JSON[0].name]
 
 
 def has_restaurant(user_id: int, restaurant_name: str) -> bool:
@@ -103,17 +93,19 @@ def add_restaurant(user_id: int, restaurant: str) -> None:
         user_id (int): The user's ID.
         restaurant (str): The restaurant's name.
     """
-    temporary_database[user_id]["restaurants"].append(restaurant)
-
-
-# ^^^ temporary ^^^
+    try:
+        state = save_states.load_game_state(user_id)
+    except ValueError:
+        state = generate_default_state()
+    state["restaurants"].append(restaurant)
+    save_states.save_game_state(user_id, state)
 
 
 def buy_restaurant(user_id: int, restaurant_name: str) -> None:
     """
     Buy a restaurant.
 
-    This function deducts the points and adds the restaurant to the user.
+    This function deducts the coins and adds the restaurant to the user.
 
     Args:
         user_id (int): The user's ID.
@@ -121,14 +113,14 @@ def buy_restaurant(user_id: int, restaurant_name: str) -> None:
 
     Raises:
         ValueError: Raised when the user already owns the restaurant.
-        ValueError: Raised when the user doesn't have the points necessary to buy the restaurant.
+        ValueError: Raised when the user doesn't have the coins necessary to buy the restaurant.
     """
     if has_restaurant(user_id, restaurant_name):
         # should be disallowed
         raise ValueError(f"User {user_id} already has restaurant {restaurant_name}!")
     restaurant = get_restaurant_by_name(restaurant_name)
-    if get_points(user_id) - restaurant.points < 0:
+    if get_coins(user_id) - restaurant.coins < 0:
         # should be disallowed
-        raise ValueError(f"User {user_id} doesn't have the necessary points to buy {restaurant_name}!")
-    add_points(user_id, -restaurant.points)
+        raise ValueError(f"User {user_id} doesn't have the necessary coins to buy {restaurant_name}!")
+    add_coins(user_id, -restaurant.coins)
     add_restaurant(user_id, restaurant_name)

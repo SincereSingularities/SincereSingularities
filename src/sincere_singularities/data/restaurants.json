@@ -3,7 +3,7 @@
     "name": "Pizzeria",
     "icon": ":pizza:",
     "description": "The Pizzaria Restaurant is the starter Restaurant. It offers typical Italian food. The Pizzaria is fairly busy.",
-    "points": 0,
+    "coins": 0,
     "order_amount": 3,
     "menu": {
       "Starters": [
@@ -54,7 +54,7 @@
     "name": "Fast Food",
     "icon": ":hamburger:",
     "description": "The Fast Food restaurant offers typically American foods including hamburgers and fries. It is very busy at all times.",
-    "points": 25,
+    "coins": 25,
     "order_amount": 4,
     "menu": {
       "Starters": [
@@ -105,7 +105,7 @@
     "name": "Meat",
     "icon": ":cut_of_meat:",
     "description": "The Meat Restaurant focuses on a wide variety of meats. But it also has some delicious desserts! You won't get that many orders for here.",
-    "points": 50,
+    "coins": 50,
     "order_amount": 2,
     "menu": {
       "Starters": [
@@ -156,7 +156,7 @@
     "name": "Sushi",
     "icon": ":sushi:",
     "description": "The Sushi restaurant offers sushi and other typically Japanese dishes. Not too many people order Sushi.",
-    "points": 50,
+    "coins": 50,
     "order_amount": 2,
     "menu": {
       "Starters": [
@@ -207,7 +207,7 @@
     "name": "Seafood",
     "icon": ":shrimp:",
     "description": "In this restaurant you can find everything the heart desires from the sea. This restaurant isn't as busy.",
-    "points": 75,
+    "coins": 75,
     "order_amount": 1,
     "menu": {
       "Starters": [
@@ -258,7 +258,7 @@
     "name": "Chinese",
     "icon": ":fortune_cookie:",
     "description": "The Chinese Restaurant serves Chinese cuisine like dumplings and fortune cookies. This restaurant can be busy at times.",
-    "points": 75,
+    "coins": 75,
     "order_amount": 3,
     "menu": {
       "Starters": [

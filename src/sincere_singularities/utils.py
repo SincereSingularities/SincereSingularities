@@ -29,7 +29,7 @@ class RestaurantJsonType:
     name: str
     icon: str
     description: str
-    points: int
+    coins: int
     order_amount: int
     menu: dict[str, list[str]]
 

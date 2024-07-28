@@ -8,8 +8,8 @@ from faker import Faker
 from sincere_singularities.data.extra_wishes import EXTRA_WISHES_WITH_ADDITIONS
 from sincere_singularities.data.intros_outros import INTROS, OUTROS
 from sincere_singularities.data.noise import NOISE
+from sincere_singularities.modules.coins import get_restaurant_by_name
 from sincere_singularities.modules.order import CustomerInformation, Order
-from sincere_singularities.modules.points import get_restaurant_by_name
 
 
 class Difficulty(Enum):

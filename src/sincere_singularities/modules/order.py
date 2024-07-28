@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import disnake
 from disnake import ButtonStyle, MessageInteraction, ModalInteraction, TextInputStyle
 
-from sincere_singularities.modules.points import add_points, get_points
+from sincere_singularities.modules.coins import add_coins, get_coins
 from sincere_singularities.utils import DISNAKE_COLORS
 
 if TYPE_CHECKING:
@@ -321,7 +321,7 @@ class OrderView(disnake.ui.View):
 
         # Calculating correctness
         correctness = self.restaurant.check_order(self.order, correct_order)
-        points = round(correctness * 10)  # 100% -> 10p
+        coins = round(correctness * 10)  # 100% -> 10p
 
         # Discarding Order in Background
         task = asyncio.create_task(self.restaurant.order_queue.discard_order(self.order.customer_information.order_id))
@@ -333,13 +333,13 @@ class OrderView(disnake.ui.View):
         bonus_seconds = 60
         completion_message = ""
         if time_taken <= bonus_seconds:
-            points += 5
-            completion_message = "You've completed the order in under a minute and get 5 bonus points! \n"
+            coins += 5
+            completion_message = "You've completed the order in under a minute and get 5 bonus coins! \n"
         elif time_taken >= correct_order.penalty_seconds:
-            points -= 5
-            completion_message = "You've took to long to complete the order and receive a 5 points penalty! \n"
+            coins -= 5
+            completion_message = "You've took to long to complete the order and receive a 5 coins penalty! \n"
 
-        add_points(interaction.user.id, points)
+        add_coins(interaction.user.id, coins)
 
         # Adding info to embed
         embed = self.restaurant.restaurants.embeds[0]
@@ -347,8 +347,8 @@ class OrderView(disnake.ui.View):
         embed.insert_field_at(
             index=1,
             name=":loudspeaker: :white_check_mark: Info :white_check_mark: :loudspeaker:",
-            value=f"**Order placed successfully! Correctness: {round(correctness, 4) * 100}%.\n {completion_message}"
-            f"You gained {points} points; you now have {get_points(interaction.user.id)}!**",
+            value=f"**Order placed successfully! Correctness: {format(correctness * 100, '.2f')}%.\n"
+            f"{completion_message}You gained {coins} coins; you now have {get_coins(interaction.user.id)}!**",
             inline=False,
         )
         await interaction.response.edit_message(embed=embed, view=self.restaurant.restaurants.view)

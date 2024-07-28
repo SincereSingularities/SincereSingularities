@@ -10,7 +10,7 @@ load_dotenv()
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
+DB_NAME = os.getenv("DB_NAME") or "bot_db"
 DB_URI = f"mongodb://{DB_HOST}:{DB_PORT}"
 utc_timezone = UTC
 
@@ -64,7 +64,7 @@ class DbClient:
             raise ConnectError("Not connected to the database")
 
         name = data["name"]
-        # Check if the restaurant already exists
+        # Check if it already exists
         if not self.db[collection].find_one({"name": name}):
             current_time = datetime.now(utc_timezone)
             data["created_at"] = current_time
@@ -186,10 +186,11 @@ class DbClient:
         if not self.connected:
             raise ConnectError("Not connected to the database")
 
-        element = self.show_one(collection, data)
+        if not upsert:
+            element = self.show_one(collection, data)
 
-        if not element:
-            raise ValueError("Element not found")
+            if not element:
+                raise ValueError("Element not found")
 
         current_time = datetime.now(utc_timezone)
         new_data["updated_at"] = current_time
