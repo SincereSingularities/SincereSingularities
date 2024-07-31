@@ -79,7 +79,7 @@ DB_HOST (The IP address of your MongoDB Server)
 DB_PORT (The port of your MongoDB Server)
 DB_NAME (Your preffered name for the MongoDB Database)
 ```
-   
+
 </details>
 
 ## Running
