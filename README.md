@@ -124,7 +124,7 @@ DB_NAME (Your preffered name for the MongoDB Database)
 Extended from [Disnake Bot Guide](https://docs.disnake.dev/en/stable/discord.html)
 1. Create a new [Discord Application](https://discord.com/developers/applications).
 2. Navigate to the Bot Tab. You can customize your bot. Reset the bot token and copy the freshly created one.
-3. Navigate to the OAuth2 Tab. 
+3. Navigate to the OAuth2 Tab.
    1. Under `Scopes`, check `bot` and `applications.commands`.
    2. Under `Bot Permissions`, check `Manage Webhooks`, `Send Messages`, `Create Public Threads`, `Send Messages in Threads`, `Manage Messages`, `Manage Threads`,
    3. Copy the `Generated URL`
@@ -155,9 +155,8 @@ Extended from [MongoDB Community Edition Installer](https://www.mongodb.com/docs
 </details>
 
 # Credits
-This project was created by (in order of contributed LOC): 
+This project was created by (in order of contributed LOC):
 
-  | [Vinyzu](https://github.com/Vinyzu) | [koviubi1](https://github.com/koviubi56) | [WassCodeur](https://github.com/WassCodeur) | [clucker_m8](https://github.com/clucker-m8)  | [FoxFil](https://github.com/foxfil) | 
+  | [Vinyzu](https://github.com/Vinyzu) | [koviubi1](https://github.com/koviubi56) | [WassCodeur](https://github.com/WassCodeur) | [clucker_m8](https://github.com/clucker-m8)  | [FoxFil](https://github.com/foxfil) |
   |-------------------------------------|------------------------------------------|---------------------------------------------|----------------------------------------------|-------------------------------------|
-  |  Game                               | Game                                     | Database                                    | Order Generation                             | Restaurant Menus                    |  
-  
+  |  Game                               | Game                                     | Database                                    | Order Generation                             | Restaurant Menus                    |
