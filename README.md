@@ -48,8 +48,8 @@ See [Installation](https://github.com/SincereSingularities/SincereSingularities?
 
 ### 1. Requirements:
    1. [Python 3.11](https://www.python.org/downloads/release/python-3110/)
-   2. [MongoDB Community Edition](https://www.mongodb.com/docs/manual/administration/install-community/). See [MongoDB Installation Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#mongodb-community-edition-installation-guide)
-   3. [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot SetUp Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#discord-bot-installation-guide)
+   2. [MongoDB Community Edition](https://www.mongodb.com/docs/manual/administration/install-community/). See [MongoDB Installation Guide](#mongodb-community-edition-installation-guide)
+   3. [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot SetUp Guide](#discord-bot-installation-guide)
 ### 2. Download:
 Run this command in the directory you want to download it to.
    ```shell
@@ -75,7 +75,7 @@ DB_NAME (Your preferred name for the MongoDB Database, defaults to `bot_db`)
 <details>
     <summary>Detailed Running Guide ⚙️</summary>
 
-### 1. Start your [MongoDB Server](https://www.mongodb.com/docs/manual/administration/install-community/). See [MongoDB Installation Guide]
+### 1. Start your [MongoDB Server](https://www.mongodb.com/docs/manual/administration/install-community/). See [MongoDB Installation Guide](#mongodb-community-edition-installation-guide)
 ### 2. Run the Game:
    ```shell
    python -m sincere_singularities
