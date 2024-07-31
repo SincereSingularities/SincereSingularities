@@ -13,23 +13,13 @@ We've created the first stressful Discord game, in which you play a phone operat
 No matter what dishes, customers, or special orders you have to serve, don't lose focus, or you might get overwhelmed by
 the information overload!
 
-## Table of contents
-1. [Getting Started](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#getting-started)
-2. [Video Presentation](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#video-presentation)
-3. [Installation](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#installation)
-4. [Running](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#running)
-5. [Gameplay Tutorial](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#gameplay)
-6. [Discord Bot Installation Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#discord-bot-installation-guide)
-7. [MongoDB Community Edition Installation Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#mongodb-community-edition-installation-guide)
-8. [Credits](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#credits)
-
 
 
 ## Getting Started
-See [Installation](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#installation) and [Running](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#running) for detailed instructions.
+See [Installation](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#installation) and [Running](#running) for detailed instructions.
 
 1. Python 3.11 is [recommended](https://github.com/DisnakeDev/disnake/pull/1135#issuecomment-1847303628). Python 3.10 - 3.12 will probably work.
-2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot Installation Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#discord-bot-installation-guide).
+2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot Installation Guide](#discord-bot-installation-guide).
 3. Clone the repository :
    ```shell
    git clone https://github.com/SincereSingularities/SincereSingularities/
@@ -76,7 +66,7 @@ Create and Edit an .env file (see .env.example)
 BOT_TOKEN (Your Discord Bot Token)
 DB_HOST (The IP address of your MongoDB Server)
 DB_PORT (The port of your MongoDB Server)
-DB_NAME (Your preffered name for the MongoDB Database, defaults to `bot_db`)
+DB_NAME (Your preferred name for the MongoDB Database, defaults to `bot_db`)
 ```
 
 </details>
