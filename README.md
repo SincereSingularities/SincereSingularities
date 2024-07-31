@@ -26,9 +26,10 @@ the information overload!
 
 
 ## Getting Started
+See [Installation](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#installation) and [Running](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#running) for detailed instructions.
 
 1. Python 3.11 is [recommended](https://github.com/DisnakeDev/disnake/pull/1135#issuecomment-1847303628). Python 3.10 - 3.12 will probably work.
-2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). <!-- TODO: explain better once we have an idea on how the bot works (e.g. what permissions are required) -->
+2. Setup a [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot Installation Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#discord-bot-installation-guide).
 3. Clone the repository :
    ```shell
    git clone https://github.com/SincereSingularities/SincereSingularities/
@@ -45,8 +46,6 @@ the information overload!
 
 ## Video Presentation
 
-Disclaimer: `The video contains Spoilers`
-
 <details>
     <summary>Video Presentation / Description</summary>
     https://www.youtube.com/
@@ -59,25 +58,25 @@ Disclaimer: `The video contains Spoilers`
 
 ### 1. Requirements:
    1. [Python 3.11](https://www.python.org/downloads/release/python-3110/)
-   2. [MongoDB Community Edition](https://www.mongodb.com/docs/manual/administration/install-community/). See [MongoDB Installation Guide]
-   3. [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot SetUp Guide]
+   2. [MongoDB Community Edition](https://www.mongodb.com/docs/manual/administration/install-community/). See [MongoDB Installation Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#mongodb-community-edition-installation-guide)
+   3. [Discord Bot](https://docs.disnake.dev/en/stable/discord.html). See [Discord Bot SetUp Guide](https://github.com/SincereSingularities/SincereSingularities?tab=readme-ov-file#discord-bot-installation-guide)
 ### 2. Download:
 Run this command in the directory you want to download it to.
    ```shell
    git clone https://github.com/SincereSingularities/SincereSingularities/
    cd SincereSingularities
    ```
-### 3. Install the Game as a PIP package & install requirements:
+### 3. Install the Game as a package via pip:
    ```shell
    pip install -e .
    ```
 ### 4. Setup local environment values:
-Create & Edit an .env file (see .env.example)
+Create and Edit an .env file (see .env.example)
 ```
 BOT_TOKEN (Your Discord Bot Token)
 DB_HOST (The IP address of your MongoDB Server)
 DB_PORT (The port of your MongoDB Server)
-DB_NAME (Your preffered name for the MongoDB Database)
+DB_NAME (Your preffered name for the MongoDB Database, defaults to `bot_db`)
 ```
 
 </details>
@@ -106,14 +105,13 @@ DB_NAME (Your preffered name for the MongoDB Database)
 3. The bot will send the menu. This contains multiple restaurants that you can buy. You already own the first one.
 4. You will get orders in the thread as messages. Choose and enter the appropriate restaurant, and select the menu items that the customer requested.
 5. Then enter the customer's information which consists of:
-- Order ID
-- Customer Name
-- Customer Address
-- Delivery Time
-- Extra Wishes
-6. Enter the ordered items.
-7. Submit the order. You will get points based on the accuracy of the order. With your earned coins you can buy new restaurants.
-8. From time to time, you will get Order Conditions. Pay attention to these Conditions when fulfilling a order. They will also disappear after some time.
+   - Order ID
+   - Customer Name
+   - Customer Address
+   - Delivery Time
+   - Extra Wishes
+6. Submit the order. You will get points based on the accuracy of the order. With your earned coins you can buy new restaurants.
+7. From time to time, you will get Order Conditions. Pay attention to these Conditions when fulfilling a order. They will also disappear after some time.
 </details>
 
 ## Discord Bot Installation Guide
