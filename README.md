@@ -35,11 +35,7 @@ See [Installation](https://github.com/SincereSingularities/SincereSingularities?
 7. Play!
 
 ## Video Presentation
-
-<details>
-    <summary>Video Presentation / Description</summary>
-    https://www.youtube.com/
-</details>
+[Video Presentation / Description](https://streamable.com/3rcyc0)
 
 
 ## Installation
@@ -144,6 +140,7 @@ Extended from [MongoDB Community Edition Installer](https://www.mongodb.com/docs
 # Credits
 This project was created by (in order of contributed LOC):
 
-  | [Vinyzu](https://github.com/Vinyzu) | [koviubi1](https://github.com/koviubi56) | [WassCodeur](https://github.com/WassCodeur) | [clucker_m8](https://github.com/clucker-m8)  | [FoxFil](https://github.com/foxfil) |
-  |-------------------------------------|------------------------------------------|---------------------------------------------|----------------------------------------------|-------------------------------------|
-  |  Game                               | Game                                     | Database                                    | Order Generation                             | Restaurant Menus                    |
+| [Vinyzu](https://github.com/Vinyzu)                                                                           | [koviubi1](https://github.com/koviubi56)                                                                                | [WassCodeur](https://github.com/WassCodeur)                                                                                   | [clucker_m8](https://github.com/clucker-m8)                                                                                   | [FoxFil](https://github.com/foxfil)                                                                           |
+|---------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| [<img src="https://github.com/vinyzu.png" alt="vinyzu" title="Vinyzu" width="66">](https://github.com/vinyzu) | [<img src="https://github.com/koviubi56.png" alt="koviubi1" title="koviubi1" width="66">](https://github.com/koviubi56) | [<img src="https://github.com/WassCodeur.png" alt="WassCodeur" title="WassCodeur" width="66">](https://github.com/WassCodeur) | [<img src="https://github.com/clucker-m8.png" alt="clucker_m8" title="clucker_m8" width="66">](https://github.com/clucker-m8) | [<img src="https://github.com/foxfil.png" alt="FoxFil" title="FoxFil" width="66">](https://github.com/foxfil) |
+| Game                                                                                                          | Game                                                                                                                    | Database                                                                                                                      | Order Generation                                                                                                              | Restaurant Menus                                                                                              |
