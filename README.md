@@ -100,6 +100,18 @@ DB_NAME (Your preferred name for the MongoDB Database, defaults to `bot_db`)
 7. From time to time, you will get Order Conditions. Pay attention to these Conditions when fulfilling a order. They will also disappear after some time.
 </details>
 
+## Helper Commands
+<details>
+    <summary>Helper Commands 🔨</summary>
+
+- /clear_threads
+</br>
+  ``Clears the Threads in the Text Channel the Command was executed in. Requires the Author to have manage_threads permissions.``
+- /clear_webhooks
+</br>
+  ``Clears the Webhooks in the Text Channel the Command was executed in. Requires the Author to have manage_webhooks permissions.``
+</details>
+
 ## Discord Bot Installation Guide
 <details>
     <summary>Discord Bot Installation Guide 🤖</summary>
