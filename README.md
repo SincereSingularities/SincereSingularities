@@ -137,6 +137,26 @@ Extended from [MongoDB Community Edition Installer](https://www.mongodb.com/docs
 
 </details>
 
+## Preview Images
+<details>
+    <summary>Preview Images 📸</summary>
+
+#### Main Menu:
+<img src="https://github.com/user-attachments/assets/fbb6ae72-de95-45db-9cc3-a1c8c720d809" width="300">
+
+#### Restaurant Menu:
+<img src="https://github.com/user-attachments/assets/292bf979-7644-4385-a47e-f244ff04016e" width="300">
+
+#### Easy Order (Pizzaria):
+<img src="https://github.com/user-attachments/assets/0b990b0b-ab11-453e-be9a-6b4f85b1d35f" width="300">
+
+#### Medium Order (Fast Food):
+<img src="https://github.com/user-attachments/assets/36ff1fe9-e7ac-49e8-8562-8fa469552384" width="300">
+
+#### Hard Order (Sushi):
+<img src="https://github.com/user-attachments/assets/5d8a83dc-7a37-4e5b-8bea-6d71a9cdcb82" width="300">
+</details>
+
 # Credits
 This project was created by (in order of contributed LOC):
 
